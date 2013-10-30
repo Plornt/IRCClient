@@ -387,18 +387,12 @@ String toString () => "";
 }
 
 /// Parameters: <channel> [ <topic> ]
-class SetTopicCommand extends ClientCommand {
+class TopicCommand extends ClientCommand {
   ChannelName channel;
   String topic;
-  SetTopicCommand (ChannelName this.channel, String this.topic);
-  String toString () => "${CLIENT_COMMANDS.TOPIC} $channel $topic";
-}
-
-/// Parameters: <channel>
-class GetTopicCommand extends ClientCommand {
-  ChannelName channel;
-  GetTopicCommand (ChannelName this.channel);
-  String toString () => "${CLIENT_COMMANDS.TOPIC} $channel";
+  TopicCommand.setTopic (ChannelName this.channel, String this.topic);
+  TopicCommand.getTopic (ChannelName this.channel);
+  String toString () => "${CLIENT_COMMANDS.TOPIC} $channel${(topic != null ? " :$topic":"")}";
 }
 
 /// Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
