@@ -335,6 +335,242 @@ class SQuitCommand {
 
 
 
+/// Parameters: ( <channel> *( "," <channel> ) [ <key> *( "," <key> ) ] )
+class JoinCommand extends ClientCommand {
+JoinCommand ();
+String toString () => "";
+}
+
+/// Parameters: <channel> *( "," <channel> ) [ <Part Message> ]
+class PartCommand extends ClientCommand {
+PartCommand ();
+String toString () => "";
+}
+
+/// Parameters: <channel> *( ( "-" / "+" ) *<modes> *<modeparams> )
+class ChannelModeCommand extends ClientCommand {
+ChannelModeCommand ();
+String toString () => "";
+}
+
+/// Parameters: <channel> [ <topic> ]
+class TOPICCommand extends ClientCommand {
+TOPICCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
+class NAMESCommand extends ClientCommand {
+NAMESCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
+class LISTCommand extends ClientCommand {
+LISTCommand ();
+String toString () => "";
+}
+
+/// Parameters: <nickname> <channel>
+class INVITECommand extends ClientCommand {
+INVITECommand ();
+String toString () => "";
+}
+
+/// Parameters: <channel> *( "," <channel> ) <user> *( "," <user> )
+class KICKCommand extends ClientCommand {
+KICKCommand ();
+String toString () => "";
+}
+
+/// Parameters: <msgtarget> <text to be sent>
+class PRIVMSGCommand extends ClientCommand {
+PRIVMSGCommand ();
+String toString () => "";
+}
+
+/// Parameters: <msgtarget> <text>
+class NOTICECommand extends ClientCommand {
+NOTICECommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <target> ]
+class MOTDCommand extends ClientCommand {
+MOTDCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <mask> [ <target> ] ]
+class LUSERSCommand extends ClientCommand {
+LUSERSCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <target> ]
+class VERSIONCommand extends ClientCommand {
+VERSIONCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <query> [ <target> ] ]
+class STATSCommand extends ClientCommand {
+STATSCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ [ <remote server> ] <server mask> ]
+class LINKSCommand extends ClientCommand {
+LINKSCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <target> ]
+class TIMECommand extends ClientCommand {
+TIMECommand ();
+String toString () => "";
+}
+
+/// Parameters: <target server> <port> [ <remote server> ]
+class CONNECTCommand extends ClientCommand {
+CONNECTCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <target> ]
+class TRACECommand extends ClientCommand {
+TRACECommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <target> ]
+class ADMINCommand extends ClientCommand {
+ADMINCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <target> ]
+class INFOCommand extends ClientCommand {
+INFOCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <mask> [ <type> ] ]
+class SERVLISTCommand extends ClientCommand {
+SERVLISTCommand ();
+String toString () => "";
+}
+
+/// Parameters: <servicename> <text>
+class SQUERYCommand extends ClientCommand {
+SQUERYCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <mask> [ "o" ] ]
+class WHOCommand extends ClientCommand {
+WHOCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <target> ] <mask> *( "," <mask> )
+class WHOISCommand extends ClientCommand {
+WHOISCommand ();
+String toString () => "";
+}
+
+/// Parameters: <nickname> *( "," <nickname> ) [ <count> [ <target> ] ]
+class WHOWASCommand extends ClientCommand {
+WHOWASCommand ();
+String toString () => "";
+}
+
+/// Parameters: <nickname> <comment>
+class KILLCommand extends ClientCommand {
+KILLCommand ();
+String toString () => "";
+}
+
+/// Parameters: <server1> [ <server2> ]
+class PINGCommand extends ClientCommand {
+PINGCommand ();
+String toString () => "";
+}
+
+/// Parameters: <server> [ <server2> ]
+class PONGCommand extends ClientCommand {
+PONGCommand ();
+String toString () => "";
+}
+
+/// Parameters: <error message>
+class ERRORCommand extends ClientCommand {
+ERRORCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <text> ]
+class AWAYCommand extends ClientCommand {
+AWAYCommand ();
+String toString () => "";
+}
+
+/// Parameters: None
+class REHASHCommand extends ClientCommand {
+REHASHCommand ();
+String toString () => "";
+}
+
+/// Parameters: None
+class DIECommand extends ClientCommand {
+DIECommand ();
+String toString () => "";
+}
+
+/// Parameters: None
+class RESTARTCommand extends ClientCommand {
+RESTARTCommand ();
+String toString () => "";
+}
+
+/// Parameters: <user> [ <target> [ <channel> ] ]
+class SUMMONCommand extends ClientCommand {
+SUMMONCommand ();
+String toString () => "";
+}
+
+/// Parameters: [ <target> ]
+class USERSCommand extends ClientCommand {
+USERSCommand ();
+String toString () => "";
+}
+
+/// Parameters: <Text to be sent>
+class WALLOPSCommand extends ClientCommand {
+WALLOPSCommand ();
+String toString () => "";
+}
+
+/// Parameters: <nickname> *( SPACE <nickname> )
+class USERHOSTCommand extends ClientCommand {
+USERHOSTCommand ();
+String toString () => "";
+}
+
+/// Parameters: <nickname> *( SPACE <nickname> )
+class ISONCommand extends ClientCommand {
+ISONCommand ();
+String toString () => "";
+}
+
+class ChannelName {
+  ChannelName (String server) {
+    
+  }
+  String toString () {
+    //TODO: IMPLEMENT
+  }
+}
 class ServerName {
   ServerName (String server) {
     
