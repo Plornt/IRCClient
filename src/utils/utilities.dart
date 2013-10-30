@@ -375,7 +375,7 @@ class PartCommand extends ClientCommand {
     channels.forEach((ChannelName chname) { 
         channelList = "$channelList${(channelList == "" ? "" : ",")}$chname";
       });
-    return "${CLIENT_COMMANDS.PART} $channelList";
+    return "${CLIENT_COMMANDS.PART} $channelList :$partMessage";
   }
 }
 
@@ -386,8 +386,8 @@ String toString () => "";
 }
 
 /// Parameters: <channel> [ <topic> ]
-class TOPICCommand extends ClientCommand {
-TOPICCommand ();
+class TopicCommand extends ClientCommand {
+TopicCommand ();
 String toString () => "";
 }
 
