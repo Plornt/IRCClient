@@ -211,7 +211,7 @@ class OperCommand extends ClientCommand {
                                    status).
  */
 class UserModeCommand {
-  Mode mode;
+  UserMode mode;
   Nickname nickname;
   UserModeCommand (this.nickname, this.mode); 
   String toString () => "MODE $nickname $mode";
@@ -380,15 +380,25 @@ class PartCommand extends ClientCommand {
 }
 
 /// Parameters: <channel> *( ( "-" / "+" ) *<modes> *<modeparams> )
+//TODO: IMPLEMENT CHANNEL MODE COMMAND - TAKES FOREVER - SKIPPING FOR NOW
 class ChannelModeCommand extends ClientCommand {
 ChannelModeCommand ();
 String toString () => "";
 }
 
 /// Parameters: <channel> [ <topic> ]
-class TopicCommand extends ClientCommand {
-TopicCommand ();
-String toString () => "";
+class SetTopicCommand extends ClientCommand {
+  ChannelName channel;
+  String topic;
+  SetTopicCommand (ChannelName this.channel, String this.topic);
+  String toString () => "${CLIENT_COMMANDS.TOPIC} $channel $topic";
+}
+
+/// Parameters: <channel>
+class GetTopicCommand extends ClientCommand {
+  ChannelName channel;
+  GetTopicCommand (ChannelName this.channel);
+  String toString () => "${CLIENT_COMMANDS.TOPIC} $channel";
 }
 
 /// Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
@@ -611,8 +621,16 @@ class ServerName {
     //TODO: IMPLEMENT
   }
 }
-class Mode {
-  Mode (String mode) {
+class UserMode {
+  UserMode (String mode) {
+    
+  }
+  String toString () {
+    //TODO: IMPLEMENT
+  }
+}
+class ChannelMode {
+  ChannelMode (String mode) {
     
   }
   String toString () {
