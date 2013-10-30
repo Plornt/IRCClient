@@ -5,6 +5,7 @@ import 'dart:isolate';
 
 class ClientCommand {
   String description;
+  bool invalid = false;
   String toString () {
     
   }
@@ -140,32 +141,76 @@ class TopicCommand extends ClientCommand {
 
 /// Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
 class NamesCommand extends ClientCommand {
-NamesCommand ();
-String toString () => "";
+  List<ChannelName> channels;
+  ServerName target = new ServerName("");
+  NamesCommand (ChannelName channel, [ServerName this.target]) {
+    channels = new List<ChannelName>();
+    channels.add(channel);
+  }
+  NamesCommand.fromList (List<ChannelName> this.channels, [ServerName this.target]);
+  String toString () {
+    String channelList = "";
+    channels.forEach((ChannelName chname) { 
+        channelList = "$channelList${(channelList == "" ? "" : ",")}$chname";
+      });
+    return "${CLIENT_COMMANDS.NAMES} $channelList $target";
+  }
 }
 
 /// Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
-class LISTCommand extends ClientCommand {
-LISTCommand ();
-String toString () => "";
+class ListCommand extends ClientCommand {
+  List<ChannelName> channels;
+  ServerName target = new ServerName("");
+  ListCommand (ChannelName channel, [ServerName this.target]) {
+    channels = new List<ChannelName>();
+    channels.add(channel);
+  }
+  ListCommand.fromList (List<ChannelName> this.channels, [ServerName this.target]);
+  String toString () {
+    String channelList = "";
+    channels.forEach((ChannelName chname) { 
+        channelList = "$channelList${(channelList == "" ? "" : ",")}$chname";
+      });
+    return "${CLIENT_COMMANDS.LIST} $channelList $target";
+  }
 }
 
 /// Parameters: <nickname> <channel>
-class INVITECommand extends ClientCommand {
-INVITECommand ();
-String toString () => "";
+class InviteCommand extends ClientCommand {
+  Nickname nick;
+  ChannelName channel;
+  InviteCommand (Nickname this.nick, ChannelName this.channel);
+  String toString () => "${CLIENT_COMMANDS.INVITE} $nick $channel";
 }
 
 /// Parameters: <channel> *( "," <channel> ) <user> *( "," <user> )
-class KICKCommand extends ClientCommand {
-KICKCommand ();
-String toString () => "";
+class KickCommand extends ClientCommand {
+  List<ChannelName> channels;
+  List<Nickname> nicks;
+  KickCommand (ChannelName channel, Nickname nick) {
+    channels = new List<ChannelName>();
+    channels.add(channel);
+    nicks = new List<Nickname>();
+    nicks.add(nick);
+  }
+  KickCommand.fromLists (List<ChannelName> this.channels, List<Nickname> nicks) {
+    if (this.channels.length == this.nicks.length) {
+      invalid = true;
+    }
+  }
+  KickCommand.fromNickList (String channel, List<Nickname> nicks) {
+    
+  }
+  KickCommand.fromChannelList (List<ChannelName> channels, Nickname nick) {
+    
+  }
+  String toString () => "";
 }
 
 /// Parameters: <msgtarget> <text to be sent>
 class PRIVMSGCommand extends ClientCommand {
-PRIVMSGCommand ();
-String toString () => "";
+  PRIVMSGCommand ();
+  String toString () => "";
 }
 
 /// Parameters: <msgtarget> <text>
@@ -544,8 +589,10 @@ class NUMERIC_REPLIES {
   static int RPL_WHOISCHANNELS = 319;
   static int RPL_WHOWASUSER = 314;
   static int RPL_ENDOFWHOWAS = 369;
-  /// DEPRECIATED
+  
+  // @depreciated 
   static int RPL_LISTSTART = 321;
+  
   static int RPL_LIST = 322;
   static int RPL_LISTEND = 323;
   static int RPL_UNIQOPIS = 325;
