@@ -336,9 +336,24 @@ class SQuitCommand {
 
 
 /// Parameters: ( <channel> *( "," <channel> ) [ <key> *( "," <key> ) ] )
-class JoinCommand extends ClientCommand {
-JoinCommand ();
-String toString () => "";
+class JoinCommand extends ClientCommand {  
+  Map<ChannelName, String> channels;
+  JoinCommand (ChannelName channel,[String key = ""]) {
+    channels = new Map<ChannelName, String>();
+    channels[channel] = key;
+  }
+  JoinCommand.fromMap (Map<ChannelName,String> channelList) {
+    channels = channelList;
+  }
+  String toString () {
+      String channelList = "";
+      String keyList = "";
+    channels.forEach((ChannelName chname, String key) { 
+        channelList = "$channelList${(channelList == "" ? "" : ",")}$chname";
+        keyList = "$keyList${(keyList == "" ? "" : ",")}$key";
+      });
+    return "$CLIENT_COMMANDS.JOIN} $channelList $keyList";
+  }
 }
 
 /// Parameters: <channel> *( "," <channel> ) [ <Part Message> ]
