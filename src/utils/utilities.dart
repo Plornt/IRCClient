@@ -343,9 +343,7 @@ class JoinCommand extends ClientCommand {
     channels = new Map<ChannelName, String>();
     channels[channel] = key;
   }
-  JoinCommand.fromMap (Map<ChannelName,String> channelList) {
-    channels = channelList;
-  }
+  JoinCommand.fromMap (Map<ChannelName,String> this.channels);
   JoinCommand.joinZero () {
     zero = true;
   }
@@ -365,8 +363,20 @@ class JoinCommand extends ClientCommand {
 
 /// Parameters: <channel> *( "," <channel> ) [ <Part Message> ]
 class PartCommand extends ClientCommand {
-PartCommand ();
-String toString () => "";
+  List<ChannelName> channels;
+  String partMessage;
+  PartCommand (ChannelName channel, [this.partMessage = ""]) {
+    channels = new List<ChannelName>();
+    channels.add(channel);
+  }
+  PartCommand.fromList (List<ChannelName> this.channels, [partMessage = ""]);
+  String toString () {
+    String channelList = "";
+    channels.forEach((ChannelName chname) { 
+        channelList = "$channelList${(channelList == "" ? "" : ",")}$chname";
+      });
+    return "${CLIENT_COMMANDS.PART} $channelList";
+  }
 }
 
 /// Parameters: <channel> *( ( "-" / "+" ) *<modes> *<modeparams> )
