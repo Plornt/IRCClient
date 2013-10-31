@@ -136,8 +136,23 @@ class PartCommand extends Command {
 /// Parameters: <channel> *( ( "-" / "+" ) *<modes> *<modeparams> )
 //TODO: IMPLEMENT CHANNEL MODE COMMAND - TAKES FOREVER - SKIPPING FOR NOW
 class ChannelModeCommand extends Command {
-ChannelModeCommand ();
-String toString () => "";
+  List<ChannelMode> modes;
+  ChannelName channel;
+  ChannelModeCommand.fromList (this.channel, this.modes);
+  String toString () { 
+    StringBuffer modeText = new StringBuffer();
+    StringBuffer modeParams = new StringBuffer();
+    bool addSym = null;
+    this.modes.forEach((ChannelMode mode) {
+      if (mode.add != addSym) {
+        addSym = mode.add;
+        modeText.write((mode.add ? "+" : "-"));
+      }
+      modeText.write(mode.modeText);
+      if (mode.params != null) modeParams.write(mode.params);
+    });
+    return new Parameter(CLIENT_COMMANDS.CHAN_MODE, params: [modeText.toString(), modeParams.toString()]).toString();
+  }
 }
 
 /// Parameters: <channel> [ <topic> ]
@@ -445,15 +460,32 @@ class WallOpsCommand extends Command {
 }
 
 /// Parameters: <nickname> *( SPACE <nickname> )
-class USERHOSTCommand extends Command {
-USERHOSTCommand ();
-String toString () => "";
+class UserHostCommand extends Command {
+  List<Nickname> nicks;
+  UserHostCommand (Nickname nick) {
+    nicks = new List<Nickname>();
+  }
+  UserHostCommand.fromList (List<Nickname> this.nicks) { 
+    if (this.nicks.length > 5) {
+      invalid = true;
+    }
+  }
+  String toString () => new Parameter(CLIENT_COMMANDS.USER_HOST, params: [nicks.join(" ")]).toString();
 }
 
 /// Parameters: <nickname> *( SPACE <nickname> )
-class ISONCommand extends Command {
-ISONCommand ();
-String toString () => "";
+class IsOnCommand extends Command {
+  String _nickList;
+  IsOnCommand (Nickname nick) {
+    this._nickList = nick.toString();    
+  }
+  IsOnCommand.fromList (List<Nickname> nicks) { 
+    _nickList = nicks.join(" ");
+    if (_nickList.length > (511 - CLIENT_COMMANDS.IS_ON.length)) {
+      invalid = true;
+    }
+  }
+  String toString () => new Parameter (CLIENT_COMMANDS.IS_ON, params: [_nickList]).toString();
 }
 
 class Target {
@@ -484,6 +516,9 @@ class UserMode {
   }
 }
 class ChannelMode {
+  bool add = true;
+  String modeText = "";
+  String params = "";
   ChannelMode (String mode) {
     
   }
