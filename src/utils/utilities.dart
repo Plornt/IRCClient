@@ -74,14 +74,14 @@ class ServiceCommand {
   int type;
   String info;
   ServiceCommand(this.serviceName, this.distribution, this.type, this.info);
-  String toString() => "${CLIENT_COMMANDS.SERVICE} $serviceName 0 $distribution $type 0 :$info";  
+  String toString() =>  new Parameter(CLIENT_COMMANDS.SERVICE, params: [serviceName, 0, distribution, type, 0], trailing: info).toString();
 }
 
 
 class QuitCommand {
   String quitMessage = "";
   QuitCommand ([this.quitMessage]);
-  String toString () => "${CLIENT_COMMANDS.QUIT} :$quitMessage";
+  String toString() =>  new Parameter(CLIENT_COMMANDS.QUIT, trailing: quitMessage).toString();
 }
 
 class SQuitCommand {
