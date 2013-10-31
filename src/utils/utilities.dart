@@ -317,26 +317,34 @@ class InfoCommand extends ClientCommand {
 }
 
 /// Parameters: [ <mask> [ <type> ] ]
-class SERVLISTCommand extends ClientCommand {
-SERVLISTCommand ();
-String toString () => "";
+class ServListCommand extends ClientCommand {
+  Target mask;
+  int type;
+  ServListCommand ([this.mask, this.type]);
+  String toString () => new Parameter(CLIENT_COMMANDS.SERV_LIST, params:[this.mask, this.type]).toString();
 }
 
 /// Parameters: <servicename> <text>
-class SQUERYCommand extends ClientCommand {
-SQUERYCommand ();
-String toString () => "";
+class SQueryCommand extends ClientCommand {
+  Target serviceName;
+  String message;
+  SQueryCommand (this.serviceName, this.message);
+  String toString () => new Parameter(CLIENT_COMMANDS.SQUERY, params: [this.serviceName], trailing: this.message).toString();
 }
 
 /// Parameters: [ <mask> [ "o" ] ]
-class WHOCommand extends ClientCommand {
-WHOCommand ();
-String toString () => "";
+class WhoCommand extends ClientCommand {
+  bool oper;
+  Target mask;
+  WhoCommand ({this.mask, this.oper});
+  String toString () => new Parameter(CLIENT_COMMANDS.OPER, params: [mask, (oper ? "o" : null)]).toString();
 }
 
 /// Parameters: [ <target> ] <mask> *( "," <mask> )
-class WHOISCommand extends ClientCommand {
-WHOISCommand ();
+class WhoIsCommand extends ClientCommand {
+  ServerName targetServer;
+  List<Target> masks;
+WhoIsCommand ();
 String toString () => "";
 }
 
