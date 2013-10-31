@@ -281,32 +281,39 @@ class LinksCommand extends ClientCommand {
 
 /// Parameters: [ <target> ]
 class TimeCommand extends ClientCommand {
-  TimeCommand ();
-  String toString () => "";
+  ServerName target;
+  TimeCommand ([ServerName this.target]);
+  String toString () => new Parameter(CLIENT_COMMANDS.TIME, params: [target]).toString();
 }
 
 /// Parameters: <target server> <port> [ <remote server> ]
-class CONNECTCommand extends ClientCommand {
-CONNECTCommand ();
-String toString () => "";
+class ConnectCommand extends ClientCommand {
+  ServerName targetServer;
+  int port;
+  ServerName remoteServer;
+  ConnectCommand (this.targetServer, this.port, [this.remoteServer]);
+  String toString () => new Parameter(CLIENT_COMMANDS.CONNECT, params: [targetServer, port, remoteServer]).toString();
 }
 
 /// Parameters: [ <target> ]
-class TRACECommand extends ClientCommand {
-TRACECommand ();
-String toString () => "";
+class TraceCommand extends ClientCommand {
+  ServerName target;
+  TraceCommand ([this.target]);
+  String toString () => new Parameter(CLIENT_COMMANDS.TRACE, params: [target]).toString();
 }
 
 /// Parameters: [ <target> ]
-class ADMINCommand extends ClientCommand {
-ADMINCommand ();
-String toString () => "";
+class AdminCommand extends ClientCommand {
+  Target target;
+  AdminCommand ([this.target]);
+  String toString () =>  new Parameter(CLIENT_COMMANDS.ADMIN, params: [target]).toString();
 }
 
 /// Parameters: [ <target> ]
-class INFOCommand extends ClientCommand {
-INFOCommand ();
-String toString () => "";
+class InfoCommand extends ClientCommand {
+  Target target;
+  InfoCommand ([this.target]);
+  String toString () =>  new Parameter(CLIENT_COMMANDS.INFO, params: [target]).toString();
 }
 
 /// Parameters: [ <mask> [ <type> ] ]
