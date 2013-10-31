@@ -6,6 +6,9 @@ abstract class ModuleHandler {
   String moduleDescription;
   int moduleVersion;
   
+  
+  SendPort _ircClient;
+  ReceivePort _receiver;
   bool _loaded = false;
   void registerEvent (String EventName) {
     if (_loaded == true) {
@@ -13,6 +16,13 @@ abstract class ModuleHandler {
     }
   }
     
+  void sendCommand (Command comm) {
+    _ircClient.send(comm);
+  }
+  
+  void _messageHandler () {
+    
+  } 
 
   bool onSendCommand (Command command);
   bool onReceiveRaw (int code, String packet);
