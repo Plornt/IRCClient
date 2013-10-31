@@ -1,6 +1,6 @@
 part of IrcModule;
 
-abstract class ModuleHandler {
+abstract class Module {
   String moduleName;
   String moduleAuthor;
   String moduleDescription;
@@ -41,7 +41,6 @@ abstract class ModuleHandler {
   
   bool onDisconnect ();
   bool onConnect ();
-  bool onModuleLoad();
   bool onModuleDeactivate();
   
 }

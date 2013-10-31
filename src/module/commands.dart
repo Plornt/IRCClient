@@ -6,9 +6,6 @@ abstract class Command {
   String toString () {
     
   }
-  void handleResponse () {
-    
-  }
 }
 class Parameter {
   List<Object> params;
