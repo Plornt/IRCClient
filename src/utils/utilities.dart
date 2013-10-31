@@ -13,21 +13,35 @@ class ClientCommand {
     
   }
 }
-
+class Parameter {
+  List<Object> params;
+  Object trailing;
+  String command;
+  Parameter(this.command, {this.params, this.trailing});
+  String toString() { 
+    StringBuffer buffer = new StringBuffer();
+    buffer.write(command);
+    if (this.params != null) {
+      params.forEach((p) { if (p != null) buffer.write(" $p"); });
+    }
+    if (this.trailing != null) buffer.write(" :$trailing");
+    return buffer.toString();
+  }
+}
 class PassCommand extends ClientCommand {
   String password = "";
   PassCommand (this.password) {
    
   }
   
-  String toString () => "${CLIENT_COMMANDS.PASS} $password";
+  String toString () => new Parameter(CLIENT_COMMANDS.PASS, params: [password]).toString();
 }
 
 
 class NickCommand extends ClientCommand {
   Nickname nick;
   NickCommand(this.nick);
-  String toString() => "${CLIENT_COMMANDS.NICK} ${nick}";
+  String toString() => new Parameter(CLIENT_COMMANDS.NICK, params: [nick]).toString();
 }
 
 class UserCommand extends ClientCommand {
@@ -35,14 +49,14 @@ class UserCommand extends ClientCommand {
   RealName realName;
   int mode;
   UserCommand(this.nick, this.mode, this.realName);
-  String toString() => "${CLIENT_COMMANDS.USER} $nick $mode * :$realName";
+  String toString() =>  new Parameter(CLIENT_COMMANDS.USER, params: [nick, mode, "*"], trailing: realName).toString();
 }
 
 class OperCommand extends ClientCommand {
   String name;
   String password;
   OperCommand (this.name, this.password);
-  String toString () => "${CLIENT_COMMANDS.OPER} $name $password";
+  String toString() =>  new Parameter(CLIENT_COMMANDS.OPER, params: [name, password]).toString();
 }
 
 
@@ -50,7 +64,7 @@ class UserModeCommand {
   UserMode mode;
   Nickname nickname;
   UserModeCommand (this.nickname, this.mode); 
-  String toString () => "MODE $nickname $mode";
+  String toString() =>  new Parameter(CLIENT_COMMANDS.USER_MODE, params: [nickname, mode]).toString();
 }
 
 
@@ -183,76 +197,113 @@ class InviteCommand extends ClientCommand {
   String toString () => "${CLIENT_COMMANDS.INVITE} $nick $channel";
 }
 
-/// Parameters: <channel> *( "," <channel> ) <user> *( "," <user> )
+/// Parameters: <channel> *( "," <channel> ) <user> *( "," <user> ) <message>
 class KickCommand extends ClientCommand {
   List<ChannelName> channels;
   List<Nickname> nicks;
+  ChannelName _fillChannel;
+  Nickname _fillNickname;  
+  String kickMessage;
   KickCommand (ChannelName channel, Nickname nick) {
     channels = new List<ChannelName>();
     channels.add(channel);
     nicks = new List<Nickname>();
     nicks.add(nick);
   }
-  KickCommand.fromLists (List<ChannelName> this.channels, List<Nickname> nicks) {
+  KickCommand.fromLists (List<ChannelName> this.channels, List<Nickname> nicks, [String this.kickMessage]) {
     if (this.channels.length == this.nicks.length) {
       invalid = true;
     }
   }
-  KickCommand.fromNickList (String channel, List<Nickname> nicks) {
-    
+  KickCommand.fromNickList (ChannelName channel, List<Nickname> this.nicks, [String this.kickMessage]) {
+    _fillChannel = channel;
   }
-  KickCommand.fromChannelList (List<ChannelName> channels, Nickname nick) {
-    
+  KickCommand.fromChannelList (List<ChannelName> channels, Nickname nick, [String this.kickMessage]) {
+    _fillNickname = nick; 
   }
-  String toString () => "";
+  String toString () {
+    if (!invalid) {
+      var cLength = (channels != null ? channels.length : (nicks != null ? nicks.length : 0));
+        String nickList = "";
+        String channelList = "";
+        for (int x = 0; x < cLength; x++) {
+          if (_fillChannel == null) { 
+            channelList = "$channelList${(channelList == "" ? "" : ",")}${channels[x]}";
+          }
+          else {
+            channelList = "$channelList${(channelList == "" ? "" : ",")}${_fillChannel}";
+          }
+          if (_fillNickname == null) { 
+            nickList = "$nickList${(nickList == "" ? "" : ",")}${nicks[x]}";
+          }
+          else {
+            nickList = "$nickList${(nickList == "" ? "" : ",")}${_fillNickname}";
+          }
+      }
+        return "{${CLIENT_COMMANDS.KICK} $channelList $nickList ${(kickMessage != null ? ":$kickMessage" : "")}";
+    }
+  }
 }
 
 /// Parameters: <msgtarget> <text to be sent>
-class PRIVMSGCommand extends ClientCommand {
-  PRIVMSGCommand ();
-  String toString () => "";
+class PrivMsgCommand extends ClientCommand {
+  Target target;
+  String message;
+  PrivMsgCommand (Target this.target, String this.message);
+  String toString () => "${CLIENT_COMMANDS.PRIV_MSG} $target :$message";
 }
 
 /// Parameters: <msgtarget> <text>
-class NOTICECommand extends ClientCommand {
-NOTICECommand ();
-String toString () => "";
+class NoticeCommand extends ClientCommand {
+  Target target;
+  String message;
+  NoticeCommand (Target this.target, String this.message);
+  String toString () => "${CLIENT_COMMANDS.NOTICE} $target :$message";
 }
 
 /// Parameters: [ <target> ]
-class MOTDCommand extends ClientCommand {
-MOTDCommand ();
-String toString () => "";
+class MotdCommand extends ClientCommand {
+  ServerName target;
+  MotdCommand ([this.target]);
+  String toString () => "${CLIENT_COMMANDS.MOTD} $target";
 }
 
 /// Parameters: [ <mask> [ <target> ] ]
-class LUSERSCommand extends ClientCommand {
-LUSERSCommand ();
-String toString () => "";
+class LusersCommand extends ClientCommand {
+  Target mask;
+  ServerName serverTarget;
+  LusersCommand ({this.mask, this.serverTarget});
+  String toString () => "${CLIENT_COMMANDS.L_USERS} $mask $serverTarget";
 }
 
 /// Parameters: [ <target> ]
-class VERSIONCommand extends ClientCommand {
-VERSIONCommand ();
-String toString () => "";
+class VersionCommand extends ClientCommand {
+  ServerName target;
+  VersionCommand (ServerName target);
+  String toString () => "${CLIENT_COMMANDS.VERSION} $target";
 }
 
 /// Parameters: [ <query> [ <target> ] ]
-class STATSCommand extends ClientCommand {
-STATSCommand ();
-String toString () => "";
+class StatsCommand extends ClientCommand {
+  String query;
+  ServerName target;
+  StatsCommand (String this.query, [ServerName this.target]);
+  StatsCommand.noQuery ();
+  String toString () => "${CLIENT_COMMANDS.STATS} $query $target";
 }
 
 /// Parameters: [ [ <remote server> ] <server mask> ]
-class LINKSCommand extends ClientCommand {
-LINKSCommand ();
-String toString () => "";
+class LinksCommand extends ClientCommand {
+  ServerName remoteServer;
+  ServerName serverMask;
+  LinksCommand (this.serverMask, [this.remoteServer]);
+  String toString () => "${CLIENT_COMMANDS.LINKS} $remoteServer $serverMask";
 }
 
 /// Parameters: [ <target> ]
-class TIMECommand extends ClientCommand {
-TIMECommand ();
-String toString () => "";
+class TimeCommand extends ClientCommand {
+  TimeCommand ();
+  String toString () => "";
 }
 
 /// Parameters: <target server> <port> [ <remote server> ]
@@ -387,7 +438,10 @@ ISONCommand ();
 String toString () => "";
 }
 
-class ChannelName {
+class Target {
+  
+}
+class ChannelName extends Target  {
   ChannelName (String server) {
     
   }
@@ -395,7 +449,7 @@ class ChannelName {
     //TODO: IMPLEMENT
   }
 }
-class ServerName {
+class ServerName extends Target {
   ServerName (String server) {
     
   }
@@ -428,7 +482,7 @@ class RealName {
     // TODO: IMPLEMENT
   }
 }
-class Nickname {
+class Nickname extends Target {
   Nickname (String name) {
     // TODO: IMPLEMENT
     
@@ -437,7 +491,7 @@ class Nickname {
     // TODO: IMPLEMENT
   }
 }
-class Host {
+class Host extends Target {
   Host (String host) {
     // TODO: IMPLEMENT
     
