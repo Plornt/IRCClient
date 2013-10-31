@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
 
-class ClientCommand {
+class Command {
   String description;
   bool invalid = false;
   String toString () {
@@ -35,7 +35,7 @@ class Parameter {
     return buffer.toString();
   }
 }
-class PassCommand extends ClientCommand {
+class PassCommand extends Command {
   String password = "";
   PassCommand (this.password) {
    
@@ -45,13 +45,13 @@ class PassCommand extends ClientCommand {
 }
 
 
-class NickCommand extends ClientCommand {
+class NickCommand extends Command {
   Nickname nick;
   NickCommand(this.nick);
   String toString() => new Parameter(CLIENT_COMMANDS.NICK, params: [nick]).toString();
 }
 
-class UserCommand extends ClientCommand {
+class UserCommand extends Command {
   Nickname nick;
   RealName realName;
   int mode;
@@ -59,7 +59,7 @@ class UserCommand extends ClientCommand {
   String toString() =>  new Parameter(CLIENT_COMMANDS.USER, params: [nick, mode, "*"], trailing: realName).toString();
 }
 
-class OperCommand extends ClientCommand {
+class OperCommand extends Command {
   String name;
   String password;
   OperCommand (this.name, this.password);
@@ -100,7 +100,7 @@ class SQuitCommand {
 
 
 /// Parameters: ( <channel> *( "," <channel> ) [ <key> *( "," <key> ) ] )
-class JoinCommand extends ClientCommand {  
+class JoinCommand extends Command {  
   Map<ChannelName, String> channels;
   bool zero = false;
   JoinCommand (ChannelName channel,[String key = ""]) {
@@ -120,7 +120,7 @@ class JoinCommand extends ClientCommand {
 }
 
 /// Parameters: <channel> *( "," <channel> ) [ <Part Message> ]
-class PartCommand extends ClientCommand {
+class PartCommand extends Command {
   List<ChannelName> channels;
   String partMessage;
   PartCommand (ChannelName channel, [this.partMessage = ""]) {
@@ -135,13 +135,13 @@ class PartCommand extends ClientCommand {
 
 /// Parameters: <channel> *( ( "-" / "+" ) *<modes> *<modeparams> )
 //TODO: IMPLEMENT CHANNEL MODE COMMAND - TAKES FOREVER - SKIPPING FOR NOW
-class ChannelModeCommand extends ClientCommand {
+class ChannelModeCommand extends Command {
 ChannelModeCommand ();
 String toString () => "";
 }
 
 /// Parameters: <channel> [ <topic> ]
-class TopicCommand extends ClientCommand {
+class TopicCommand extends Command {
   ChannelName channel;
   String topic;
   TopicCommand.setTopic (ChannelName this.channel, String this.topic);
@@ -150,7 +150,7 @@ class TopicCommand extends ClientCommand {
 }
 
 /// Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
-class NamesCommand extends ClientCommand {
+class NamesCommand extends Command {
   List<ChannelName> channels;
   ServerName target = new ServerName("");
   NamesCommand ({ChannelName channel, ServerName this.target}) {
@@ -162,7 +162,7 @@ class NamesCommand extends ClientCommand {
 }
 
 /// Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
-class ListCommand extends ClientCommand {
+class ListCommand extends Command {
   List<ChannelName> channels;
   ServerName target = new ServerName("");
   ListCommand ({ChannelName channel, ServerName this.target}) {
@@ -175,7 +175,7 @@ class ListCommand extends ClientCommand {
 }
 
 /// Parameters: <nickname> <channel>
-class InviteCommand extends ClientCommand {
+class InviteCommand extends Command {
   Nickname nick;
   ChannelName channel;
   InviteCommand (Nickname this.nick, ChannelName this.channel);
@@ -183,7 +183,7 @@ class InviteCommand extends ClientCommand {
 }
 
 /// Parameters: <channel> *( "," <channel> ) <user> *( "," <user> ) <message>
-class KickCommand extends ClientCommand {
+class KickCommand extends Command {
   List<ChannelName> channels = new List<ChannelName>();
   List<Nickname> nicks = new List<Nickname>();
   ChannelName _fillChannel;
@@ -223,7 +223,7 @@ class KickCommand extends ClientCommand {
 }
 
 /// Parameters: <msgtarget> <text to be sent>
-class PrivMsgCommand extends ClientCommand {
+class PrivMsgCommand extends Command {
   Target target;
   String message;
   PrivMsgCommand (Target this.target, String this.message);
@@ -231,7 +231,7 @@ class PrivMsgCommand extends ClientCommand {
 }
 
 /// Parameters: <msgtarget> <text>
-class NoticeCommand extends ClientCommand {
+class NoticeCommand extends Command {
   Target target;
   String message;
   NoticeCommand (Target this.target, String this.message);
@@ -239,31 +239,29 @@ class NoticeCommand extends ClientCommand {
 }
 
 /// Parameters: [ <target> ]
-class MotdCommand extends ClientCommand {
+class MotdCommand extends Command {
   ServerName target;
   MotdCommand ([this.target]);
-  String toString () => "${CLIENT_COMMANDS.MOTD} $target";
   String toString () => new Parameter(CLIENT_COMMANDS.MOTD, params: [target]).toString();
 }
 
 /// Parameters: [ <mask> [ <target> ] ]
-class LusersCommand extends ClientCommand {
+class LusersCommand extends Command {
   Target mask;
   ServerName serverTarget;
   LusersCommand ({this.mask, this.serverTarget});
-  String toString () => "${CLIENT_COMMANDS.L_USERS} $mask $serverTarget";
   String toString () => new Parameter(CLIENT_COMMANDS.L_USERS, params: [mask,serverTarget]).toString();
 }
 
 /// Parameters: [ <target> ]
-class VersionCommand extends ClientCommand {
+class VersionCommand extends Command {
   ServerName target;
   VersionCommand (ServerName target);
   String toString () => new Parameter(CLIENT_COMMANDS.VERSION, params: [target]).toString();
 }
 
 /// Parameters: [ <query> [ <target> ] ]
-class StatsCommand extends ClientCommand {
+class StatsCommand extends Command {
   String query;
   ServerName target;
   StatsCommand (String this.query, [ServerName this.target]);
@@ -272,7 +270,7 @@ class StatsCommand extends ClientCommand {
 }
 
 /// Parameters: [ [ <remote server> ] <server mask> ]
-class LinksCommand extends ClientCommand {
+class LinksCommand extends Command {
   ServerName remoteServer;
   ServerName serverMask;
   LinksCommand (this.serverMask, [this.remoteServer]);
@@ -280,14 +278,14 @@ class LinksCommand extends ClientCommand {
 }
 
 /// Parameters: [ <target> ]
-class TimeCommand extends ClientCommand {
+class TimeCommand extends Command {
   ServerName target;
   TimeCommand ([ServerName this.target]);
   String toString () => new Parameter(CLIENT_COMMANDS.TIME, params: [target]).toString();
 }
 
 /// Parameters: <target server> <port> [ <remote server> ]
-class ConnectCommand extends ClientCommand {
+class ConnectCommand extends Command {
   ServerName targetServer;
   int port;
   ServerName remoteServer;
@@ -296,28 +294,28 @@ class ConnectCommand extends ClientCommand {
 }
 
 /// Parameters: [ <target> ]
-class TraceCommand extends ClientCommand {
+class TraceCommand extends Command {
   ServerName target;
   TraceCommand ([this.target]);
   String toString () => new Parameter(CLIENT_COMMANDS.TRACE, params: [target]).toString();
 }
 
 /// Parameters: [ <target> ]
-class AdminCommand extends ClientCommand {
+class AdminCommand extends Command {
   Target target;
   AdminCommand ([this.target]);
   String toString () =>  new Parameter(CLIENT_COMMANDS.ADMIN, params: [target]).toString();
 }
 
 /// Parameters: [ <target> ]
-class InfoCommand extends ClientCommand {
+class InfoCommand extends Command {
   Target target;
   InfoCommand ([this.target]);
   String toString () =>  new Parameter(CLIENT_COMMANDS.INFO, params: [target]).toString();
 }
 
 /// Parameters: [ <mask> [ <type> ] ]
-class ServListCommand extends ClientCommand {
+class ServListCommand extends Command {
   Target mask;
   int type;
   ServListCommand ([this.mask, this.type]);
@@ -325,7 +323,7 @@ class ServListCommand extends ClientCommand {
 }
 
 /// Parameters: <servicename> <text>
-class SQueryCommand extends ClientCommand {
+class SQueryCommand extends Command {
   Target serviceName;
   String message;
   SQueryCommand (this.serviceName, this.message);
@@ -333,7 +331,7 @@ class SQueryCommand extends ClientCommand {
 }
 
 /// Parameters: [ <mask> [ "o" ] ]
-class WhoCommand extends ClientCommand {
+class WhoCommand extends Command {
   bool oper;
   Target mask;
   WhoCommand ({this.mask, this.oper});
@@ -341,93 +339,119 @@ class WhoCommand extends ClientCommand {
 }
 
 /// Parameters: [ <target> ] <mask> *( "," <mask> )
-class WhoIsCommand extends ClientCommand {
+class WhoIsCommand extends Command {
   ServerName targetServer;
   List<Target> masks;
-WhoIsCommand ();
-String toString () => "";
+  WhoIsCommand (Target mask, [this.targetServer]) {
+   masks = new List<Target>();
+   masks.add(mask);
+  }
+  WhoIsCommand.fromList (this.masks, [this.targetServer]);
+  String toString () => new Parameter(CLIENT_COMMANDS.WHO_IS, params: [targetServer, masks]).toString();
 }
 
 /// Parameters: <nickname> *( "," <nickname> ) [ <count> [ <target> ] ]
-class WHOWASCommand extends ClientCommand {
-WHOWASCommand ();
-String toString () => "";
+class WhoWasCommand extends Command {
+  ServerName target;
+  int count;
+  List<Nickname> nicks;
+  WhoWasCommand.fromList (this.nicks, {this.target, this.count});
+  WhoWasCommand (Target nick, {this.target, this.count}) {
+    nicks = new List<Nickname>();
+    nicks.add(nick);
+  }
+  String toString () => new Parameter(CLIENT_COMMANDS.WHO_WAS, params: [this.nicks, this.count, this.target]).toString();
 }
 
 /// Parameters: <nickname> <comment>
-class KILLCommand extends ClientCommand {
-KILLCommand ();
-String toString () => "";
+class KillCommand extends Command {
+  Nickname nick;
+  String comment;
+  KillCommand (this.nick, this.comment);
+  String toString () => new Parameter(CLIENT_COMMANDS.KILL, params: [this.nick, this.comment]).toString();
 }
 
 /// Parameters: <server1> [ <server2> ]
-class PINGCommand extends ClientCommand {
-PINGCommand ();
-String toString () => "";
+class PingCommand extends Command {
+  Target server1;
+  Target server2;
+  PingCommand (Target this.server1, [Target this.server2]);
+  String toString () => new Parameter(CLIENT_COMMANDS.PING, params: [server1, server2]).toString();
 }
 
 /// Parameters: <server> [ <server2> ]
-class PONGCommand extends ClientCommand {
-PONGCommand ();
-String toString () => "";
+class PongCommand extends Command {
+  Target server1;
+  Target server2;
+  PongCommand (Target this.server1, [Target this.server2]);
+  String toString () => new Parameter(CLIENT_COMMANDS.PONG, params: [server1, server2]).toString();
 }
 
 /// Parameters: <error message>
-class ERRORCommand extends ClientCommand {
-ERRORCommand ();
-String toString () => "";
+class ErrorCommand extends Command {
+  String errorMessage;
+  ErrorCommand (this.errorMessage);
+  /// NOT A CLIENT COMMAND BUT IMPLEMENTED SOMEWHAT JUST FOR WHATEVER REASON 
+  String toString () => new Parameter(CLIENT_COMMANDS.ERROR, trailing: errorMessage).toString();
 }
 
 /// Parameters: [ <text> ]
-class AWAYCommand extends ClientCommand {
-AWAYCommand ();
-String toString () => "";
+class AwayCommand extends Command {
+  String awayMessage;
+  AwayCommand (this.awayMessage);
+  AwayCommand.remove();
+  String toString () => new Parameter(CLIENT_COMMANDS.AWAY, trailing: awayMessage).toString();
 }
 
 /// Parameters: None
-class REHASHCommand extends ClientCommand {
-REHASHCommand ();
-String toString () => "";
+class RehashCommand extends Command {
+  RehashCommand ();
+  String toString () => new Parameter(CLIENT_COMMANDS.REHASH).toString();
 }
 
 /// Parameters: None
-class DIECommand extends ClientCommand {
-DIECommand ();
-String toString () => "";
+class DieCommand extends Command {
+  DieCommand ();
+  String toString () => new Parameter(CLIENT_COMMANDS.DIE).toString();
 }
 
 /// Parameters: None
-class RESTARTCommand extends ClientCommand {
-RESTARTCommand ();
-String toString () => "";
+class RestartCommand extends Command {
+  RestartCommand ();
+  String toString () => new Parameter(CLIENT_COMMANDS.RESTART).toString();
 }
 
 /// Parameters: <user> [ <target> [ <channel> ] ]
-class SUMMONCommand extends ClientCommand {
-SUMMONCommand ();
-String toString () => "";
+class SummonCommand extends Command {
+  Nickname nick;
+  Target target;
+  ChannelName channel;
+  SummonCommand (this.nick, {this.target, this.channel});
+  String toString () => new Parameter(CLIENT_COMMANDS.SUMMON, params: [this.nick, this.target, this.channel]).toString();
 }
 
 /// Parameters: [ <target> ]
-class USERSCommand extends ClientCommand {
-USERSCommand ();
-String toString () => "";
+class UsersCommand extends Command {
+  Target target;
+  UsersCommand ([this.target]);
+  String toString () => new Parameter(CLIENT_COMMANDS.USER, params: [target]).toString();
 }
 
 /// Parameters: <Text to be sent>
-class WALLOPSCommand extends ClientCommand {
-WALLOPSCommand ();
-String toString () => "";
+class WallOpsCommand extends Command {
+  String message;
+  WallOpsCommand (this.message);
+  String toString () => new Parameter(CLIENT_COMMANDS.WALL_OPS, trailing: message).toString();
 }
 
 /// Parameters: <nickname> *( SPACE <nickname> )
-class USERHOSTCommand extends ClientCommand {
+class USERHOSTCommand extends Command {
 USERHOSTCommand ();
 String toString () => "";
 }
 
 /// Parameters: <nickname> *( SPACE <nickname> )
-class ISONCommand extends ClientCommand {
+class ISONCommand extends Command {
 ISONCommand ();
 String toString () => "";
 }
