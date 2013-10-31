@@ -22,7 +22,14 @@ class Parameter {
     StringBuffer buffer = new StringBuffer();
     buffer.write(command);
     if (this.params != null) {
-      params.forEach((p) { if (p != null) buffer.write(" $p"); });
+      
+      params.forEach((p) { 
+        if (p != null && p.runtimeType == "List") {
+          List temp = p;
+          buffer.write(temp.join(","));
+        }
+        else if (p != null) buffer.write(" $p"); 
+      });
     }
     if (this.trailing != null) buffer.write(" :$trailing");
     return buffer.toString();
@@ -88,8 +95,7 @@ class SQuitCommand {
   ServerName server;
   String comment;
   SQuitCommand (this.server, this.comment);
-  String toString () => "SQUIT $server :$comment";
-  
+  String toString() =>  new Parameter(CLIENT_COMMANDS.SQUIT, trailing: comment).toString();
 }
 
 
@@ -106,15 +112,9 @@ class JoinCommand extends ClientCommand {
     zero = true;
   }
   String toString () {
-    if (zero) return "${CLIENT_COMMANDS.JOIN} 0";
+    if (zero) return new Parameter(CLIENT_COMMANDS.JOIN, params: [0]).toString();
     else {
-      String channelList = "";
-      String keyList = "";
-    channels.forEach((ChannelName chname, String key) { 
-        channelList = "$channelList${(channelList == "" ? "" : ",")}$chname";
-        keyList = "$keyList${(keyList == "" ? "" : ",")}$key";
-      });
-    return "${CLIENT_COMMANDS.JOIN} $channelList $keyList";
+      return new Parameter(CLIENT_COMMANDS.JOIN,params: [channels.keys.toList(), channels.values.toList()]).toString();
     }
   }
 }
@@ -129,11 +129,7 @@ class PartCommand extends ClientCommand {
   }
   PartCommand.fromList (List<ChannelName> this.channels, [partMessage = ""]);
   String toString () {
-    String channelList = "";
-    channels.forEach((ChannelName chname) { 
-        channelList = "$channelList${(channelList == "" ? "" : ",")}$chname";
-      });
-    return "${CLIENT_COMMANDS.PART} $channelList :$partMessage";
+    return new Parameter(CLIENT_COMMANDS.PART, params: [channels], trailing: partMessage).toString();
   }
 }
 
@@ -150,43 +146,32 @@ class TopicCommand extends ClientCommand {
   String topic;
   TopicCommand.setTopic (ChannelName this.channel, String this.topic);
   TopicCommand.getTopic (ChannelName this.channel);
-  String toString () => "${CLIENT_COMMANDS.TOPIC} $channel${(topic != null ? " :$topic":"")}";
+  String toString() =>  new Parameter(CLIENT_COMMANDS.TOPIC, params: [channel], trailing: topic).toString();
 }
 
 /// Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
 class NamesCommand extends ClientCommand {
   List<ChannelName> channels;
   ServerName target = new ServerName("");
-  NamesCommand (ChannelName channel, [ServerName this.target]) {
+  NamesCommand ({ChannelName channel, ServerName this.target}) {
     channels = new List<ChannelName>();
     channels.add(channel);
   }
   NamesCommand.fromList (List<ChannelName> this.channels, [ServerName this.target]);
-  String toString () {
-    String channelList = "";
-    channels.forEach((ChannelName chname) { 
-        channelList = "$channelList${(channelList == "" ? "" : ",")}$chname";
-      });
-    return "${CLIENT_COMMANDS.NAMES} $channelList $target";
-  }
+  String toString() =>  new Parameter(CLIENT_COMMANDS.NAMES, params: [channels, target]).toString();
 }
 
 /// Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
 class ListCommand extends ClientCommand {
   List<ChannelName> channels;
   ServerName target = new ServerName("");
-  ListCommand (ChannelName channel, [ServerName this.target]) {
+  ListCommand ({ChannelName channel, ServerName this.target}) {
     channels = new List<ChannelName>();
     channels.add(channel);
   }
   ListCommand.fromList (List<ChannelName> this.channels, [ServerName this.target]);
-  String toString () {
-    String channelList = "";
-    channels.forEach((ChannelName chname) { 
-        channelList = "$channelList${(channelList == "" ? "" : ",")}$chname";
-      });
-    return "${CLIENT_COMMANDS.LIST} $channelList $target";
-  }
+
+  String toString() =>  new Parameter(CLIENT_COMMANDS.LIST, params: [channels, target]).toString();
 }
 
 /// Parameters: <nickname> <channel>
@@ -194,13 +179,13 @@ class InviteCommand extends ClientCommand {
   Nickname nick;
   ChannelName channel;
   InviteCommand (Nickname this.nick, ChannelName this.channel);
-  String toString () => "${CLIENT_COMMANDS.INVITE} $nick $channel";
+  String toString() =>  new Parameter(CLIENT_COMMANDS.INVITE, params: [nick, channel]).toString();
 }
 
 /// Parameters: <channel> *( "," <channel> ) <user> *( "," <user> ) <message>
 class KickCommand extends ClientCommand {
-  List<ChannelName> channels;
-  List<Nickname> nicks;
+  List<ChannelName> channels = new List<ChannelName>();
+  List<Nickname> nicks = new List<Nickname>();
   ChannelName _fillChannel;
   Nickname _fillNickname;  
   String kickMessage;
@@ -224,25 +209,17 @@ class KickCommand extends ClientCommand {
   String toString () {
     if (!invalid) {
       var cLength = (channels != null ? channels.length : (nicks != null ? nicks.length : 0));
-        String nickList = "";
-        String channelList = "";
-        for (int x = 0; x < cLength; x++) {
-          if (_fillChannel == null) { 
-            channelList = "$channelList${(channelList == "" ? "" : ",")}${channels[x]}";
-          }
-          else {
-            channelList = "$channelList${(channelList == "" ? "" : ",")}${_fillChannel}";
-          }
-          if (_fillNickname == null) { 
-            nickList = "$nickList${(nickList == "" ? "" : ",")}${nicks[x]}";
-          }
-          else {
-            nickList = "$nickList${(nickList == "" ? "" : ",")}${_fillNickname}";
-          }
+      for (int x = 0; x < cLength; x++) {
+        if (_fillChannel != null) 
+          channels.add(_fillChannel);
+        }
+        if (_fillNickname != null) {
+          nicks.add(_fillNickname);
+        }
       }
-        return "{${CLIENT_COMMANDS.KICK} $channelList $nickList ${(kickMessage != null ? ":$kickMessage" : "")}";
-    }
+      return new Parameter(CLIENT_COMMANDS.KICK, params: [channels, nicks], trailing: kickMessage).toString();
   }
+
 }
 
 /// Parameters: <msgtarget> <text to be sent>
@@ -250,7 +227,7 @@ class PrivMsgCommand extends ClientCommand {
   Target target;
   String message;
   PrivMsgCommand (Target this.target, String this.message);
-  String toString () => "${CLIENT_COMMANDS.PRIV_MSG} $target :$message";
+  String toString () => new Parameter(CLIENT_COMMANDS.PRIV_MSG, params: [target], trailing: message).toString();
 }
 
 /// Parameters: <msgtarget> <text>
@@ -258,7 +235,7 @@ class NoticeCommand extends ClientCommand {
   Target target;
   String message;
   NoticeCommand (Target this.target, String this.message);
-  String toString () => "${CLIENT_COMMANDS.NOTICE} $target :$message";
+  String toString () => new Parameter(CLIENT_COMMANDS.NOTICE, params: [target], trailing: message).toString();
 }
 
 /// Parameters: [ <target> ]
@@ -266,6 +243,7 @@ class MotdCommand extends ClientCommand {
   ServerName target;
   MotdCommand ([this.target]);
   String toString () => "${CLIENT_COMMANDS.MOTD} $target";
+  String toString () => new Parameter(CLIENT_COMMANDS.MOTD, params: [target]).toString();
 }
 
 /// Parameters: [ <mask> [ <target> ] ]
@@ -274,13 +252,14 @@ class LusersCommand extends ClientCommand {
   ServerName serverTarget;
   LusersCommand ({this.mask, this.serverTarget});
   String toString () => "${CLIENT_COMMANDS.L_USERS} $mask $serverTarget";
+  String toString () => new Parameter(CLIENT_COMMANDS.L_USERS, params: [mask,serverTarget]).toString();
 }
 
 /// Parameters: [ <target> ]
 class VersionCommand extends ClientCommand {
   ServerName target;
   VersionCommand (ServerName target);
-  String toString () => "${CLIENT_COMMANDS.VERSION} $target";
+  String toString () => new Parameter(CLIENT_COMMANDS.VERSION, params: [target]).toString();
 }
 
 /// Parameters: [ <query> [ <target> ] ]
@@ -289,7 +268,7 @@ class StatsCommand extends ClientCommand {
   ServerName target;
   StatsCommand (String this.query, [ServerName this.target]);
   StatsCommand.noQuery ();
-  String toString () => "${CLIENT_COMMANDS.STATS} $query $target";
+  String toString () => new Parameter(CLIENT_COMMANDS.STATS, params: [query, target]).toString();
 }
 
 /// Parameters: [ [ <remote server> ] <server mask> ]
@@ -297,7 +276,7 @@ class LinksCommand extends ClientCommand {
   ServerName remoteServer;
   ServerName serverMask;
   LinksCommand (this.serverMask, [this.remoteServer]);
-  String toString () => "${CLIENT_COMMANDS.LINKS} $remoteServer $serverMask";
+  String toString () => new Parameter(CLIENT_COMMANDS.LINKS, params: [remoteServer, serverMask]).toString();
 }
 
 /// Parameters: [ <target> ]
