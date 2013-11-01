@@ -37,9 +37,10 @@ class IrcHandler {
           moduleHandler.sendCommand(new JoinCommand(new ChannelName(fullCommand[2])), nickname);
           break;
         case CLIENT_COMMANDS.CHAN_MODE: 
-          moduleHandler.sendCommand(new PartCommand(new ChannelName(fullCommand[2]), fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
+          
+          moduleHandler.sendCommand(, nickname);
           break;
-        c
+        
       }
     }
   }
