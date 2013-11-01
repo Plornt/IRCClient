@@ -26,6 +26,7 @@ class SendCommand extends IsolatePacket {
 
 /// Received by the module handler 
 class CommandEvent extends IsolatePacket {
+  Target sender;
   Command event;
-  CommandEvent (this.event);
+  CommandEvent.withTarget (this.sender,this.event);
 }

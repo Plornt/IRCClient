@@ -26,6 +26,7 @@ class Parameter {
       });
     }
     if (this.trailing != null) buffer.write(" :$trailing");
+    buffer.write(STRINGS.crlf);
     return buffer.toString();
   }
 }
@@ -83,7 +84,7 @@ class QuitCommand extends Command  {
   String toString() =>  new Parameter(CLIENT_COMMANDS.QUIT, trailing: quitMessage).toString();
 }
 
-class SQuitCommand {
+class SQuitCommand extends Command {
   ServerName server;
   String comment;
   SQuitCommand (this.server, this.comment);

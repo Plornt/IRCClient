@@ -48,10 +48,22 @@ class RealName {
   }
 }
 class Nickname extends Target {
+  Host hostname;
+  String name;
   Nickname (String name) {
     // TODO: IMPLEMENT
-    
+    name = name;
   }
+  Nickname.fromHostString (String splitter) {
+   List<String> nickHost = splitter.split("!");
+   if (splitter.length == 2) { 
+     this.name = splitter[0];
+     this.hostname = new Host(splitter[1]);
+   }
+   else {
+      throw "Does not match required syntax";     
+   }
+  }  
   String toString () {
     // TODO: IMPLEMENT
   }

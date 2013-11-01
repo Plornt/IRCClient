@@ -1,19 +1,31 @@
 part of IRCClient;
 
 class ModuleHandler {
+ List<ModuleContainer> modules = new List<ModuleContainer>();
+ ModuleHandler ();
  
-  
+ void sendPacket(IsolatePacket packet) {
+   modules.forEach((module) {
+     if (module.active) {
+       module.sendMessage(packet);
+     }
+   });
+ }
+ void sendCommand (Command comm, [Nickname sender = null]) {
+   sendPacket(new CommandEvent.withTarget(sender, comm));
+ }
 }
 
 class ModuleContainer {
   Module module;
-  IrcHandler handler;
+  ModuleHandler handler;
   Isolate _isolate;
   ReceivePort _port;
   SendPort _sender;
   String moduleName;
   bool _loaded = false;
-  ModuleContainer (String this.moduleName, IrcHandler this.handler);
+  bool active = true;
+  ModuleContainer (String this.moduleName, ModuleHandler this.handler);
   
   void initialize () {
     _port = new ReceivePort();
@@ -26,6 +38,12 @@ class ModuleContainer {
   
   void unloadModule () {
     
+  }
+  
+  void sendMessage(IsolatePacket packet) {
+    if (_loaded) {
+      _sender.send(packet);
+    }
   }
   
   void reloadModule() {
