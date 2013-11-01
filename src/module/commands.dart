@@ -67,7 +67,7 @@ class UserModeCommand {
 }
 
 
-class ServiceCommand {
+class ServiceCommand extends Command  {
   String serviceName;
   String distribution;
   int type;
@@ -77,7 +77,7 @@ class ServiceCommand {
 }
 
 
-class QuitCommand {
+class QuitCommand extends Command  {
   String quitMessage = "";
   QuitCommand ([this.quitMessage]);
   String toString() =>  new Parameter(CLIENT_COMMANDS.QUIT, trailing: quitMessage).toString();

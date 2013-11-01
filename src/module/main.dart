@@ -9,3 +9,4 @@ part 'types.dart';
 part 'commands.dart';
 part 'enum.dart';
 part 'module_handler.dart';
+part 'isolate_packet.dart';
