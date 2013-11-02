@@ -27,11 +27,11 @@ class UserMode {
     //TODO: IMPLEMENT
   }
 }
-class ChannelMode {
+class ChanMode {
   bool add = true;
   String modeText = "";
   String params = "";
-  ChannelMode (String mode) {
+  ChanMode (String mode) {
     
   }
   String toString () {

@@ -38,7 +38,6 @@ class IrcHandler {
           break;
         case CLIENT_COMMANDS.CHAN_MODE: 
           
-          moduleHandler.sendCommand(, nickname);
           break;
         
       }

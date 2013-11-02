@@ -1,11 +1,7 @@
 part of IrcModule;
 
 abstract class Module {
-  String moduleName;
-  String moduleAuthor;
-  String moduleDescription;
-  int moduleVersion;
-  
+ 
   
   SendPort _ircClient;
   ReceivePort _me;
@@ -66,23 +62,23 @@ abstract class Module {
     }
   } 
 
-  bool onSendCommand (Command command);
-  bool onReceiveRaw (int code, String packet);
-  bool onChannelJoin (JoinCommand command);
-  bool onChannelPart (PartCommand command);
-  bool onNickChange (NickCommand command);
-  bool onChannelMessage (PrivMsgCommand command);
-  bool onPrivateMessage (PrivMsgCommand command);
-  bool onChannelNotice (NoticeCommand command);
-  bool onPrivateNotice (NoticeCommand command);
-  bool onServerError (ErrorCommand command);
-  bool onQuit (QuitCommand command); 
-  bool onTopicChange (TopicCommand command);
-  bool onKick (KickCommand command);
+  bool onSendCommand (Command command) { }
+  bool onReceiveRaw (int code, String packet){ }
+  bool onChannelJoin (JoinCommand command){ }
+  bool onChannelPart (PartCommand command){ }
+  bool onNickChange (NickCommand command){ }
+  bool onChannelMessage (PrivMsgCommand command){ }
+  bool onPrivateMessage (PrivMsgCommand command){ }
+  bool onChannelNotice (NoticeCommand command){ }
+  bool onPrivateNotice (NoticeCommand command){ }
+  bool onServerError (ErrorCommand command){ }
+  bool onQuit (QuitCommand command){ }
+  bool onTopicChange (TopicCommand command){ }
+  bool onKick (KickCommand command){ }
   
-  bool onModuleStart ();
-  bool onDisconnect ();
-  bool onConnect ();
-  bool onModuleDeactivate();
+  bool onModuleStart (){ }
+  bool onDisconnect (){ }
+  bool onConnect (){ }
+  bool onModuleDeactivate(){ }
   
 }

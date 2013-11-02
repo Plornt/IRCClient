@@ -64,6 +64,50 @@ class CLIENT_COMMANDS {
   static const String IS_ON = "ISON";
   
 }
+class NUMERIC5_PARAM {
+  static const String CMDS = "CMDS";
+  static const String PREFIX = "PREFIX";
+  static const String CHAN_TYPES = "CHANTYPES";
+  static const String CHAN_MODES = "CHANMODES";
+  static const String MODES = "MODES";
+  static const String MAX_CHANNELS = "MAXCHANNELS";
+  static const String CHAN_LIMIT = "CHANLIMIT";
+  static const String NICK_LENGTH = "NICKLEN";
+  static const String MAX_BANS = "MAXBANS";
+  static const String MAX_LIST = "MAXLIST";
+  static const String NETWORK = "NETWORK";
+  static const String EXCEPTS = "EXCEPTS";
+  static const String INVEX = "INVEX";
+  static const String WALL_CHANNEL_OPS = "WALLCHOPS";
+  static const String WALL_VOICES = "WALLVOICES";
+  static const String CASE_MAPPING = "CASEMAPPING";
+  static const String EXTENSIONS_LIST = "ELIST";
+  static const String TOPIC_LENGTH = "TOPICLEN";
+  static const String KICK_LENGTH = "KICKLEN";
+  static const String CHANNEL_LENGTH = "CHANNELLEN";
+  static const String CHANNEL_ID_LENGTH = "CHIDLEN";
+  static const String ID_CHANNEL = "IDCHAN";
+  static const String STANDARD = "STD";
+  static const String SILENCE = "SILENCE";
+  static const String RFC2812 = "RFC2812";
+  static const String PENALTY = "PENALTY";
+  static const String FNC = "FNC";
+  static const String SAFELIST = "SAFELIST";
+  static const String AWAY_LENGTH = "AWAYLEN";
+  static const String NO_QUIT = "NOQUIT";
+  static const String USER_IP = "USERIP";
+  static const String CHANNEL_PRIVATE_MESSAGE = "CPRIVMESSAGE";
+  static const String CHANNEL_NOTICE = "CNOTICE";
+  static const String MAX_NICK_LENGTH = "MAXNICKLEN";
+  static const String MAX_TARGETS = "MAXTARGETS";
+  static const String KNOCK = "KNOCK";
+  static const String VIRTUAL_CHANNELS = "VCHANS";
+  static const String WATCH = "WATCH";
+  static const String WHOX = "WHOX";
+  static const String CALLER_ID = "CALLERID";
+  static const String ACCEPT = "ACCEPT";
+  static const String LANGUAGE = "LANGUAGE";
+}
 
 class NUMERIC_REPLIES {
   // Errors

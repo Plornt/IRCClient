@@ -128,14 +128,14 @@ class PartCommand extends Command {
 
 /// Parameters: <channel> *( ( "-" / "+" ) *<modes> *<modeparams> )
 class ChannelModeCommand extends Command {
-  List<ChannelMode> modes;
+  List<ChanMode> modes;
   ChannelName channel;
   ChannelModeCommand.fromList (this.channel, this.modes);
   String toString () { 
     StringBuffer modeText = new StringBuffer();
     StringBuffer modeParams = new StringBuffer();
     bool addSym = null;
-    this.modes.forEach((ChannelMode mode) {
+    this.modes.forEach((ChanMode mode) {
       if (mode.add != addSym) {
         addSym = mode.add;
         modeText.write((mode.add ? "+" : "-"));

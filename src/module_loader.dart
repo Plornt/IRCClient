@@ -22,18 +22,47 @@ class ModuleContainer {
   Isolate _isolate;
   ReceivePort _port;
   SendPort _sender;
-  String moduleName;
   bool _loaded = false;
   bool active = true;
-  ModuleContainer (String this.moduleName, ModuleHandler this.handler);
+  String moduleFolder;
+  
+  // Metadata
+  String moduleName = "";
+  String moduleAuthor = "";
+  String moduleDescription = "";
+  String moduleImage = "";
+  num moduleVersion = 0;
+  
+  
+  ModuleContainer (String this.moduleFolder, ModuleHandler this.handler);
   
   void initialize () {
-    _port = new ReceivePort();
-    SendPort sendPort = _port.sendPort;
-    Isolate.spawnUri(Uri.parse(moduleName),[],sendPort).then((Isolate iso) { 
-      _isolate = iso;
-      _port.listen(handleMessage);
-    });
+    File f = new File("modules/$moduleFolder/module.dart");
+    if (f.existsSync()) {
+      File _moduleDescription = new File("modules/$moduleFolder/module.json");
+      if (_moduleDescription.existsSync()) {
+        try {
+          dynamic obj = new JsonDecoder(null).convert(_moduleDescription.readAsStringSync());
+          if (obj != null) {
+            if (obj["name"] != null && obj["name"] is String) { moduleName = obj["name"]; }
+            if (obj["author"] != null && obj["author"] is String) { moduleAuthor = obj["author"]; }
+            if (obj["description"] != null && obj["description"] is String) { moduleDescription = obj["description"]; }
+            if (obj["image"] != null && obj["image"] is String) { moduleImage = obj["image"]; }
+            if (obj["version"] != null && obj["version"] is num) { moduleVersion = obj["version"]; }
+          }
+        }
+        catch (e) {
+          // Dont stop the script running, not that important that the module has a proper json file
+          print ("Malformed json file in module $moduleFolder");
+        }
+      }
+      _port = new ReceivePort();
+      SendPort sendPort = _port.sendPort;
+      Isolate.spawnUri(Uri.parse(moduleFolder),[],sendPort).then((Isolate iso) { 
+        _isolate = iso;
+        _port.listen(handleMessage);
+      });
+    }
   }
   
   void unloadModule () {
