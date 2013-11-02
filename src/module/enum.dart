@@ -64,7 +64,7 @@ class CLIENT_COMMANDS {
   static const String IS_ON = "ISON";
   
 }
-class NUMERIC5_PARAM {
+class ISUPPORT_PARAMS {
   static const String CMDS = "CMDS";
   static const String PREFIX = "PREFIX";
   static const String CHAN_TYPES = "CHANTYPES";
@@ -171,7 +171,8 @@ class NUMERIC_REPLIES {
   static const int RPL_YOUREHOST = 002;
   static const int RPL_CREATED = 003;
   static const int RPL_MYINFO = 004;
-  static const int RPL_BOUNCE = 005;
+  // Seriously this can have 2 different meanings... who the hell thought that was a good idea :/
+  static const int RPL_BOUNCE_OR_ISUPPORT = 005;
   static const int RPL_USERHOST = 302;
   static const int RPL_ISON = 303;
   static const int RPL_AWAY = 301;

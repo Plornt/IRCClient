@@ -10,3 +10,8 @@ part 'commands.dart';
 part 'enum.dart';
 part 'module_handler.dart';
 part 'isolate_packet.dart';
+
+void throwError (String error) {
+  throw "Error found: $error"
+        "Please pass this message on to the developers of this IRCBot.";
+}
