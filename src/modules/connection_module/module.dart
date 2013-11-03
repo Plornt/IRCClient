@@ -51,12 +51,79 @@ class ISupportResponse {
              if (furtherParam.length == 2) {
               List<String> splitModes = furtherParam[1].split(",");
               if (splitModes.length == 4) {
-                
+                parameters[ISUPPORT_PARAMS.CHAN_MODES] = splitModes;  
               }
               else error = true;
              }
              else error = true;
             break;
+         case ISUPPORT_PARAMS.MODES: 
+           int maxModes = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (maxModes > 0) {
+             parameters[ISUPPORT_PARAMS.MODES] = maxModes;
+           }
+           break;
+         case ISUPPORT_PARAMS.MAX_CHANNELS: 
+           int maxChannels = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (maxChannels > 0) {
+             parameters[ISUPPORT_PARAMS.MAX_CHANNELS] = maxChannels;
+           }
+           break;
+         case ISUPPORT_PARAMS.CHAN_LIMIT: 
+           List<String> splitLimits = furtherParam[1].split(",");
+           Map<String, int> limits = new Map<String, int>();
+           splitLimits.forEach((String limitStr) {
+             List<String> prefixToLimit = limitStr.split(":");
+             if (prefixToLimit == 2) {
+               int maxChannels = int.parse(prefixToLimit[1], onError: (String s) { error = true; });
+               List<String> splitPrefix = prefixToLimit[0].split("");
+               splitPrefix.forEach((e) { 
+                 limits[e] = maxChannels;
+               });
+             }
+           });
+           if (limits.length > 0) parameters[ISUPPORT_PARAMS.CHAN_LIMIT] = limits;
+           break;
+         case ISUPPORT_PARAMS.NICK_LENGTH: 
+           int nickLen = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (nickLen > 0) {
+             parameters[ISUPPORT_PARAMS.NICK_LENGTH] = nickLen;
+           }  
+           break;
+         case ISUPPORT_PARAMS.MAX_BANS: 
+           int maxBans = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (maxBans > 0) {
+             parameters[ISUPPORT_PARAMS.MAX_BANS] = maxBans;
+           }  
+           break;
+         case ISUPPORT_PARAMS.MAX_LIST: 
+           List<String> splitLimits = furtherParam[1].split(",");
+           Map<String, int> limits = new Map<String, int>();
+           splitLimits.forEach((String limitStr) {
+             List<String> prefixToLimit = limitStr.split(":");
+             if (prefixToLimit == 2) {
+               int maxList = int.parse(prefixToLimit[1], onError: (String s) { error = true; });
+               List<String> splitPrefix = prefixToLimit[0].split("");
+               splitPrefix.forEach((e) { 
+                 limits[e] = maxList;
+               });
+             }
+           });
+           if (limits.length > 0) parameters[ISUPPORT_PARAMS.MAX_LIST] = limits;
+           break;
+         case ISUPPORT_PARAMS.NETWORK: 
+           if (furtherParam[1].length > 0) {
+             parameters[ISUPPORT_PARAMS.NETWORK] = furtherParam[1];
+           }
+           break;
+         case ISUPPORT_PARAMS.EXCEPTS: 
+           if (furtherParam[1].length == 1) {
+            parameters[ISUPPORT_PARAMS.EXCEPTS] = furtherParam[1];
+           }
+           break;
+         case ISUPPORT_PARAMS.PREFIX: 
+           
+           break;
          case ISUPPORT_PARAMS.PREFIX: 
            
            break;
