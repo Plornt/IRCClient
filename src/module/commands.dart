@@ -196,7 +196,7 @@ class KickCommand extends Command {
   ChannelName _fillChannel;
   Nickname _fillNickname;  
   String kickMessage;
-  KickCommand (ChannelName channel, Nickname nick) {
+  KickCommand (ChannelName channel, Nickname nick, [String this.kickMessage]) {
     channels = new List<ChannelName>();
     channels.add(channel);
     nicks = new List<Nickname>();

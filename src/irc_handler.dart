@@ -71,6 +71,10 @@ class IrcHandler {
         case CLIENT_COMMANDS.JOIN: 
           moduleHandler.sendCommand(new JoinCommand(new ChannelName(fullCommand[2].substring(1))), nickname);
           break;
+        case CLIENT_COMMANDS.PART: 
+          
+          moduleHandler.sendCommand(new PartCommand(new ChannelName(fullCommand[2]),fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
+          break;
         case CLIENT_COMMANDS.CHAN_MODE: 
           //<- :Innocent!angelic@till.you.can.prove.otherwise MODE #zstaff -m 
           ChannelName channel = new ChannelName(fullCommand[2]);
@@ -99,7 +103,19 @@ class IrcHandler {
           }
           moduleHandler.sendCommand(new ChannelModeCommand.fromList(channel, changedModes), nickname);
           break;
-        
+        case CLIENT_COMMANDS.TOPIC:
+          moduleHandler.sendCommand(new TopicCommand.setTopic(new ChannelName(fullCommand[2]), fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
+          break;
+        case CLIENT_COMMANDS.KICK:
+          moduleHandler.sendCommand(new KickCommand(new ChannelName(fullCommand[2]), new Nickname(fullCommand[3]),  fullCommand.getRange(4, fullCommand.length).join(" ").substring(1)), nickname);
+          break;
+        case CLIENT_COMMANDS.PRIV_MSG:
+          
+          moduleHandler.sendCommand(new PrivMsgCommand(new Target(fullCommand[2]),  fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
+          break;
+        case CLIENT_COMMANDS.NOTICE:
+          
+          break;
       }
     }
   }

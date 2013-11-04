@@ -76,6 +76,9 @@ abstract class Module {
       else if (comm is KickCommand) {
         onKick(message.sender, comm);
       }      
+      else if (comm is ChannelModeCommand) { 
+        onChannelMode(message.sender, comm);
+      }
     }
   } 
 
@@ -85,6 +88,7 @@ abstract class Module {
   bool onChannelPart (Target user, PartCommand command){ }
   bool onNickChange (Target user, NickCommand command){ }
   bool onChannelMessage (Target user, PrivMsgCommand command){ }
+  bool onChannelMode (Target user, ChannelModeCommand command){ }
   bool onPrivateMessage (Target user, PrivMsgCommand command){ }
   bool onChannelNotice (Target user, NoticeCommand command){ }
   bool onPrivateNotice (Target user, NoticeCommand command){ }
