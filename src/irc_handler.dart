@@ -115,12 +115,28 @@ class IrcHandler {
           moduleHandler.sendCommand(new KickCommand(new ChannelName(fullCommand[2]), new Nickname(fullCommand[3]),  fullCommand.getRange(4, fullCommand.length).join(" ").substring(1)), nickname);
           break;
         case CLIENT_COMMANDS.PRIV_MSG:
-          
-          moduleHandler.sendCommand(new PrivMsgCommand(new Target(fullCommand[2]),  fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
+          Target target;
+          if (ChannelPrefix.isChannel(fullCommand[2])) {
+            target = new ChannelName(fullCommand[2]);
+          }
+          else target = new Nickname(fullCommand[2]);
+          moduleHandler.sendCommand(new PrivMsgCommand(target,  fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
           break;
         case CLIENT_COMMANDS.NOTICE:
-          
+          Target target;
+          if (ChannelPrefix.isChannel(fullCommand[2])) {
+            target = new ChannelName(fullCommand[2]);
+          }
+          else target = new Nickname(fullCommand[2]);
+          moduleHandler.sendCommand(new NoticeCommand(target,  fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
           break;
+               
+      }
+      RegExp num = new RegExp(r"^([0-9][0-9][0-9])$");
+      if (num.hasMatch(command)) {
+        Match m = num.firstMatch(command);
+        int raw = int.parse(m.group(0));
+        moduleHandler.sendPacket(new RawPacket(raw, fullCommand.getRange(2, fullCommand.length).join(" ")));
       }
     }
   }

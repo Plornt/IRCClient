@@ -32,6 +32,14 @@ class CommandEvent extends IsolatePacket {
   CommandEvent.withTarget (this.sender,this.event);
 }
 
+
+/// Received by the module handler 
+class RawPacket extends IsolatePacket {
+  int raw;
+  String command;
+  RawPacket (this.raw, this.command);
+}
+
 /// Received by the module handler 
 class ISupportPacket extends IsolatePacket {
   Map<String, dynamic> parameters;

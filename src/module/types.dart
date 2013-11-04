@@ -20,7 +20,6 @@ class ChannelPrefix {
   ChannelPrefix (String this.prefix) {
     prefixes.add(this);
   }
-  
 }
 class ChannelName extends Target  {
   ChannelPrefix prefix;

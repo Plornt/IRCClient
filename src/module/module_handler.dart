@@ -80,6 +80,9 @@ abstract class Module {
         onChannelMode(message.sender, comm);
       }
     }
+    else if (message is RawPacket) {
+      onReceiveRaw (message.raw, message.command);
+    }
   } 
 
   bool onSendCommand (Command command) { }
