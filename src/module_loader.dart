@@ -2,7 +2,8 @@ part of IRCClient;
 
 class ModuleHandler {
  List<ModuleContainer> modules = new List<ModuleContainer>();
- ModuleHandler ();
+ IrcHandler ircHandler;
+ ModuleHandler (this.ircHandler);
  
  void sendPacket(IsolatePacket packet) {
    modules.forEach((module) {
@@ -14,6 +15,9 @@ class ModuleHandler {
  void sendCommand (Command comm, [Nickname sender = null]) {
    sendPacket(new CommandEvent.withTarget(sender, comm));
  }
+ 
+ 
+ 
 }
 
 class ModuleContainer {
@@ -87,6 +91,11 @@ class ModuleContainer {
      }
      else if (message is SendCommand) {
        
+     }
+     else if (message is ISupportPacket) {
+       message.parameters.forEach((k, v) { 
+         this.handler.ircHandler.addISupportParameter(k, v);         
+       });      
      }
   }
 }

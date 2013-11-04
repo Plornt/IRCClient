@@ -7,9 +7,10 @@ abstract class IsolatePacket {
 }
 
 /// Used to request the sendport from a module
-class SendPortRequest extends IsolatePacket {
+class ModuleStartRequest extends IsolatePacket {
   SendPort sendBack;
-  SendPortRequest (SendPort this.sendBack);
+  Nickname myName;
+  ModuleStartRequest (SendPort this.sendBack);
 }
 
 /// Used to send the sendport to the handler
@@ -29,4 +30,10 @@ class CommandEvent extends IsolatePacket {
   Target sender;
   Command event;
   CommandEvent.withTarget (this.sender,this.event);
+}
+
+/// Received by the module handler 
+class ISupportPacket extends IsolatePacket {
+  Map<String, dynamic> parameters;
+  ISupportPacket (this.parameters);
 }

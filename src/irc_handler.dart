@@ -5,9 +5,40 @@ class IrcHandler {
   Socket _connection;
   ModuleHandler moduleHandler = new ModuleHandler();
   int port;
+  Map<String, dynamic> iSupportResponse = new Map<String, dynamic> ();
+  Nickname myNick; 
+  
   InternetAddress ip;
+  
   IrcHandler () {
     
+  }
+  
+  void addISupportParameter (String parameter, dynamic value) {
+    iSupportResponse[parameter] = value;
+    if (parameter == ISUPPORT_PARAMS.CHAN_MODES) {
+      if (value is List<String>) {
+        int x = 1;
+        value.forEach((f) { 
+           List<String> modes = f.split("");
+           modes.forEach((mode) {
+             if (x == 1) new ChanModeValidator(mode,true, false);
+             else if (x == 2) new ChanModeValidator(mode, true, false);
+             else if (x == 3) new ChanModeValidator (mode, false, true);
+             else if (x == 4) new ChanModeValidator (mode, false, false);
+           });
+           x++;
+        });
+      }
+    }
+    else if (parameter == ISUPPORT_PARAMS.PREFIX) {
+      if (value is List<List<String>>) {
+        value.forEach((List<String> prefixes) {
+          new ChanModeValidator(prefixes[0], true, false);
+          new NicknamePrefix(prefixes[0], prefixes[1]);
+        });
+      }
+    }
   }
   void startClient () {
     Socket.connect(ip, port).then((Socket socket) {
@@ -25,7 +56,11 @@ class IrcHandler {
       switch (command) {
         // TODO: Fix this up so it doesnt look absolutely ugly
         case CLIENT_COMMANDS.NICK:
-          moduleHandler.sendCommand(new NickCommand(new Nickname(fullCommand[2])), nickname);
+          NickCommand nickCommand = new NickCommand(new Nickname(fullCommand[2]));
+          if (nickname.name == myNick) {
+            myNick = new Nickname(fullCommand[2].substring(1));
+          }
+          moduleHandler.sendCommand(new NickCommand(myNick), nickname);
           break;
         case CLIENT_COMMANDS.QUIT:
           moduleHandler.sendCommand(new QuitCommand(fullCommand.getRange(2, fullCommand.length).join(" ").substring(1)), nickname);
@@ -34,10 +69,35 @@ class IrcHandler {
           moduleHandler.sendCommand(new SQuitCommand(new ServerName(fullCommand[2]), fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
           break;
         case CLIENT_COMMANDS.JOIN: 
-          moduleHandler.sendCommand(new JoinCommand(new ChannelName(fullCommand[2])), nickname);
+          moduleHandler.sendCommand(new JoinCommand(new ChannelName(fullCommand[2].substring(1))), nickname);
           break;
         case CLIENT_COMMANDS.CHAN_MODE: 
-          
+          //<- :Innocent!angelic@till.you.can.prove.otherwise MODE #zstaff -m 
+          ChannelName channel = new ChannelName(fullCommand[2]);
+          String modeStr = fullCommand[3];
+          bool plus = true;
+          int currParam = 3;
+          List<ChanMode> changedModes = new List<ChanMode>();
+          for (int x = 0; x < modeStr.length; x++) {
+            if (modeStr[x] == "+") plus = true;
+            else if (modeStr[x] == "-") plus = false;
+            
+            bool found = false;
+            for (int i = 0; i < ChanModeValidator.modes.length; i++) {
+              ChanModeValidator curMode = ChanModeValidator.modes[i];
+              if (curMode.modeText == modeStr[x]) {
+                String paramText = "";
+                if (curMode.requiresParameter || (curMode.paramOnlyOnSet && plus == true)) {
+                  currParam++;
+                  paramText = fullCommand[currParam];
+                }
+                changedModes.add(new ChanMode(modeStr[x], paramText, plus));
+                found = true;
+              }
+            }
+            if (found == false) throwError("Incorrect mode found: $message");
+          }
+          moduleHandler.sendCommand(new ChannelModeCommand.fromList(channel, changedModes), nickname);
           break;
         
       }
