@@ -121,18 +121,145 @@ class ISupportResponse {
             parameters[ISUPPORT_PARAMS.EXCEPTS] = furtherParam[1];
            }
            break;
-         case ISUPPORT_PARAMS.PREFIX: 
-           
+         case ISUPPORT_PARAMS.INVEX: 
+           if (furtherParam[1].length == 1) {
+             parameters[ISUPPORT_PARAMS.INVEX] = furtherParam[1];
+           }
            break;
-         case ISUPPORT_PARAMS.PREFIX: 
-           
+         case ISUPPORT_PARAMS.WALL_CHANNEL_OPS: 
+           parameters[ISUPPORT_PARAMS.WALL_CHANNEL_OPS] = true;
            break;
-         case ISUPPORT_PARAMS.PREFIX: 
-           
+         case ISUPPORT_PARAMS.WALL_VOICES: 
+           parameters[ISUPPORT_PARAMS.WALL_VOICES] = true;
            break;
-         case ISUPPORT_PARAMS.PREFIX: 
-           
+         case ISUPPORT_PARAMS.STATUS_MESSAGE: 
+           if (furtherParam[1].length > 0) { 
+            parameters[ISUPPORT_PARAMS.STATUS_MESSAGE] = furtherParam[1].split("");
+           }
            break;
+         case ISUPPORT_PARAMS.CASE_MAPPING: 
+           if (furtherParam[1].length > 0) {
+             parameters[ISUPPORT_PARAMS.CASE_MAPPING] = furtherParam[1];
+           }
+           break;
+         case ISUPPORT_PARAMS.EXTENSIONS_LIST: 
+           if (furtherParam[1].length > 0) { 
+             parameters[ISUPPORT_PARAMS.EXTENSIONS_LIST] = furtherParam[1].split("");
+           }
+           break;
+         case ISUPPORT_PARAMS.TOPIC_LENGTH: 
+           int topicLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (topicLength > 0) {
+             parameters[ISUPPORT_PARAMS.TOPIC_LENGTH] = topicLength;
+           }  
+           break;
+         case ISUPPORT_PARAMS.KICK_LENGTH: 
+           int kickLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (kickLength > 0) {
+             parameters[ISUPPORT_PARAMS.KICK_LENGTH] = kickLength;
+           }  
+           break;
+         case ISUPPORT_PARAMS.CHANNEL_LENGTH: 
+           int channelLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (channelLength > 0) {
+             parameters[ISUPPORT_PARAMS.CHANNEL_LENGTH] = channelLength;
+           }  
+           break;
+         case ISUPPORT_PARAMS.CHANNEL_ID_LENGTH: 
+           int channelIDLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (channelIDLength > 0) {
+             parameters[ISUPPORT_PARAMS.CHANNEL_ID_LENGTH] = channelIDLength;
+           }  
+           break;
+         case ISUPPORT_PARAMS.ID_CHANNEL: 
+           List<String> splitLimits = furtherParam[1].split(",");
+           Map<String, int> limits = new Map<String, int>();
+           splitLimits.forEach((String limitStr) {
+             List<String> prefixToLimit = limitStr.split(":");
+             if (prefixToLimit == 2) {
+               int maxList = int.parse(prefixToLimit[1], onError: (String s) { error = true; });
+               List<String> splitPrefix = prefixToLimit[0].split("");
+               splitPrefix.forEach((e) { 
+                 limits[e] = maxList;
+               });
+             }
+           });
+           if (limits.length > 0) parameters[ISUPPORT_PARAMS.ID_CHANNEL] = limits;
+           break;
+         case ISUPPORT_PARAMS.STANDARD: 
+           if (furtherParam[1].length > 0) {
+             parameters[ISUPPORT_PARAMS.STANDARD] = furtherParam[1];
+           }
+           break;
+         case ISUPPORT_PARAMS.SILENCE: 
+           int silenceLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (silenceLength > 0) {
+             parameters[ISUPPORT_PARAMS.SILENCE] = silenceLength;
+           }  
+           break;
+         case ISUPPORT_PARAMS.RFC2812: 
+           parameters[ISUPPORT_PARAMS.RFC2812] = true;
+           break;
+         case ISUPPORT_PARAMS.PENALTY: 
+           parameters[ISUPPORT_PARAMS.PENALTY] = true;
+           break;
+         case ISUPPORT_PARAMS.FNC: 
+           parameters[ISUPPORT_PARAMS.FNC] = true;
+           break;
+         case ISUPPORT_PARAMS.SAFELIST: 
+           parameters[ISUPPORT_PARAMS.SAFELIST] = true;
+           break;
+         case ISUPPORT_PARAMS.AWAY_LENGTH: 
+           int awayLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (awayLength > 0) {
+             parameters[ISUPPORT_PARAMS.AWAY_LENGTH] = awayLength;
+           }  
+           break;     
+         case ISUPPORT_PARAMS.NO_QUIT: 
+           parameters[ISUPPORT_PARAMS.NO_QUIT] = true;
+           break;          
+         case ISUPPORT_PARAMS.USER_IP: 
+           parameters[ISUPPORT_PARAMS.USER_IP] = true;           
+           break;          
+         case ISUPPORT_PARAMS.CHANNEL_PRIVATE_MESSAGE: 
+           parameters[ISUPPORT_PARAMS.CHANNEL_PRIVATE_MESSAGE] = true;               
+           break;          
+         case ISUPPORT_PARAMS.CHANNEL_NOTICE: 
+           parameters[ISUPPORT_PARAMS.CHANNEL_NOTICE] = true;   
+           break;          
+         case ISUPPORT_PARAMS.MAX_NICK_LENGTH: 
+           int maxNickLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (maxNickLength > 0) {
+             parameters[ISUPPORT_PARAMS.MAX_NICK_LENGTH] = maxNickLength;
+           }  
+           break;          
+         case ISUPPORT_PARAMS.MAX_TARGETS: 
+           int maxTargets = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (maxTargets > 0) {
+             parameters[ISUPPORT_PARAMS.MAX_TARGETS] = maxTargets;
+           }  
+           break;           
+         case ISUPPORT_PARAMS.KNOCK: 
+           parameters[ISUPPORT_PARAMS.KNOCK] = true;   
+           break;           
+         case ISUPPORT_PARAMS.VIRTUAL_CHANNELS: 
+           parameters[ISUPPORT_PARAMS.VIRTUAL_CHANNELS] = true;   
+           break;           
+         case ISUPPORT_PARAMS.WATCH: 
+           int maxWatch = int.parse(furtherParam[1], onError: (String s) { error = true; });
+           if (maxWatch > 0) {
+             parameters[ISUPPORT_PARAMS.WATCH] = maxWatch;
+           }  
+           break;            
+         case ISUPPORT_PARAMS.WHOX: 
+           parameters[ISUPPORT_PARAMS.WHOX] = true;   
+           break;                 
+         case ISUPPORT_PARAMS.CALLER_ID: 
+           parameters[ISUPPORT_PARAMS.CALLER_ID] = true;   
+           break;                 
+         case ISUPPORT_PARAMS.ACCEPT: 
+           parameters[ISUPPORT_PARAMS.CALLER_ID] = true;   
+           break;                      
        }
        if (error) throwError ("Malformed ISupport Message: $params");
    });

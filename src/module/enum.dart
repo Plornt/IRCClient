@@ -80,6 +80,7 @@ class ISUPPORT_PARAMS {
   static const String INVEX = "INVEX";
   static const String WALL_CHANNEL_OPS = "WALLCHOPS";
   static const String WALL_VOICES = "WALLVOICES";
+  static const String STATUS_MESSAGE = "STATUSMSG";
   static const String CASE_MAPPING = "CASEMAPPING";
   static const String EXTENSIONS_LIST = "ELIST";
   static const String TOPIC_LENGTH = "TOPICLEN";
