@@ -3,9 +3,29 @@ part of IrcModule;
 class Target {
   
 }
+
+class ChannelPrefix { 
+  static List<ChannelPrefix> prefixes = new List<ChannelPrefix>();
+  
+  static bool isChannel (String name) { 
+    for (int i = 0; i<prefixes.length;i++) {
+      if (prefixes[i].prefix == name[0]) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  final String prefix;
+  ChannelPrefix (String this.prefix) {
+    prefixes.add(this);
+  }
+  
+}
 class ChannelName extends Target  {
-  ChannelName (String server) {
-    
+  ChannelPrefix prefix;
+  ChannelName (String channel) {
+   
   }
   String toString () {
     //TODO: IMPLEMENT

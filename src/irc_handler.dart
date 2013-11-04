@@ -39,6 +39,11 @@ class IrcHandler {
         });
       }
     }
+    else if (parameter == ISUPPORT_PARAMS.CHAN_TYPES) {
+      if (value is List<String>) {
+        value.forEach((prefix) { new ChannelPrefix(prefix); });
+      }
+    }
   }
   void startClient () {
     Socket.connect(ip, port).then((Socket socket) {
