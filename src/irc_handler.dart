@@ -3,15 +3,17 @@ part of IRCClient;
 
 class IrcHandler {
   Socket _connection;
-  ModuleHandler moduleHandler = new ModuleHandler();
+  ModuleHandler moduleHandler;
   int port;
+  InternetAddress ip;
+  String serverPassword;
   Map<String, dynamic> iSupportResponse = new Map<String, dynamic> ();
   Nickname myNick; 
   
-  InternetAddress ip;
   
-  IrcHandler () {
-    
+  IrcHandler (this.ip, this.port, this.myNick, [this.serverPassword]) {
+    moduleHandler = new ModuleHandler(this);
+    moduleHandler.initialize();    
   }
   
   void addISupportParameter (String parameter, dynamic value) {
@@ -47,10 +49,15 @@ class IrcHandler {
   }
   void startClient () {
     Socket.connect(ip, port).then((Socket socket) {
-            socket.transform(new Utf8Decoder()).transform(new LineSplitter ()).listen(messageHandler);
+      _connection = socket;
+      moduleHandler.sendPacket(new ConnectionStatusPacket(true));
+      socket.transform(new Utf8Decoder()).transform(new LineSplitter ()).listen(messageHandler, 
+          onError: (e) { moduleHandler.sendPacket(new ConnectionStatusPacket(false));}, 
+          onDone: () { moduleHandler.sendPacket(new ConnectionStatusPacket(false)); });
     });
   }
   void messageHandler (String message) {
+    print("< $message");
     if (message[0] == ":") {
       message = message.substring(1);
       List<String> fullCommand = message.split(" ");
@@ -132,16 +139,45 @@ class IrcHandler {
           break;
                
       }
+      print(command);
       RegExp num = new RegExp(r"^([0-9][0-9][0-9])$");
       if (num.hasMatch(command)) {
+        print("Regex match");
         Match m = num.firstMatch(command);
         int raw = int.parse(m.group(0));
+        print(raw);
         moduleHandler.sendPacket(new RawPacket(raw, fullCommand.getRange(2, fullCommand.length).join(" ")));
+        
+        // TODO: THIS WAS COPIED FROM ANOTHER FILE AND AS SUCH DOES POINTLESS GET RANGES ETC... FIX THIS.
+        String packet = fullCommand.getRange(2, fullCommand.length).join(" ");
+        if (raw == NUMERIC_REPLIES.RPL_BOUNCE_OR_ISUPPORT) {
+          // Following is the only way to check if its a bounce or isupport that I know of
+          // Worst... Protocol... EVER.
+
+          List<String> isupport = packet.split(" ");
+          print(isupport.getRange(isupport.length - 5, isupport.length).join(" "));
+          if (isupport.getRange(isupport.length - 5, isupport.length).toList().join(" ") == ":are supported by this server") {
+            print("Parsing ISUPPORT");
+            List<String> s = isupport.getRange(1, isupport.length - 5).toList();
+            String p = s.join(" ");
+            print(p);
+            ISupportParser parser = new ISupportParser.parse(p);
+            parser.parameters.forEach((k, v) { 
+              addISupportParameter(k, v);         
+            });     
+          }
+          
+        }
+      
+      
+      
       }
     }
   }
   void sendCommand (Command comm) {
-    
+    if (_connection != null) {
+      _connection.writeln(comm.toString());
+    }
   }
   
 }

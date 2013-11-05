@@ -3,17 +3,42 @@ part of IRCClient;
 class ModuleHandler {
  List<ModuleContainer> modules = new List<ModuleContainer>();
  IrcHandler ircHandler;
- ModuleHandler (this.ircHandler);
+ String serverPassword;
+ 
+ ModuleHandler (this.ircHandler, [this.serverPassword]);
+ 
+ 
+ void initialize () {
+   Directory thisFolder = new Directory(".\\modules\\");
+   print("Checking folder exists");
+   if (thisFolder.existsSync()) {
+     List<FileSystemEntity> listSync = thisFolder.listSync(recursive: false);
+     listSync.forEach((FileSystemEntity f) { 
+       if (f is Directory) {
+          File moduleCheck = new File("${f.path}\\module.dart");
+          print("Checking if module exists");
+          if (moduleCheck.existsSync()) {
+            List<String> folderName = moduleCheck.path.split("\\");
+            print("Loading module ${folderName[folderName.length -2]}");
+            modules.add(new ModuleContainer(folderName[folderName.length -2], this));
+          }
+       }
+     });
+   }
+   modules.forEach((ModuleContainer mc) { mc.initialize(); });
+ }
  
  void sendPacket(IsolatePacket packet) {
+   print("Attempting packet send");
    modules.forEach((module) {
      if (module.active) {
+       print("Sending packet");
        module.sendMessage(packet);
      }
    });
  }
  void sendCommand (Command comm, [Nickname sender = null]) {
-   sendPacket(new CommandEvent.withTarget(sender, comm));
+   sendPacket(new CommandEventPacket.withTarget(sender, comm));
  }
  
  
@@ -41,9 +66,9 @@ class ModuleContainer {
   ModuleContainer (String this.moduleFolder, ModuleHandler this.handler);
   
   void initialize () {
-    File f = new File("modules/$moduleFolder/module.dart");
+    File f = new File(".\\modules\\$moduleFolder\\module.dart");
     if (f.existsSync()) {
-      File _moduleDescription = new File("modules/$moduleFolder/module.json");
+      File _moduleDescription = new File(".\\modules\\$moduleFolder\\module.json");
       if (_moduleDescription.existsSync()) {
         try {
           dynamic obj = new JsonDecoder(null).convert(_moduleDescription.readAsStringSync());
@@ -62,15 +87,21 @@ class ModuleContainer {
       }
       _port = new ReceivePort();
       SendPort sendPort = _port.sendPort;
-      Isolate.spawnUri(Uri.parse(moduleFolder),[],sendPort).then((Isolate iso) { 
+      Isolate.spawnUri(Uri.parse(".\\modules\\$moduleFolder\\module.dart"),[],new ModuleStartPacket(sendPort, handler.ircHandler.myNick)).then((Isolate iso) { 
         _isolate = iso;
+        active = true;
+        _loaded = true;
         _port.listen(handleMessage);
       });
     }
   }
   
   void unloadModule () {
-    
+    if (_loaded == true) {
+    this.sendMessage(new StopModulePacket());
+    _loaded = false;
+    active = false;
+    }
   }
   
   void sendMessage(IsolatePacket packet) {
@@ -81,21 +112,21 @@ class ModuleContainer {
   
   void reloadModule() {
     if (_loaded == true) {
-                  
+      this.sendMessage(new StopModulePacket());
+      _loaded = false;
+      active = false;
+      _port.close();
+      this.initialize();
     }
   }
   
   void handleMessage (dynamic message) {
-     if (message is SendPortResponse) {
+     if (message is SendportResponsePacket) {
        _sender = message.port;
      }
-     else if (message is SendCommand) {
-       
-     }
-     else if (message is ISupportPacket) {
-       message.parameters.forEach((k, v) { 
-         this.handler.ircHandler.addISupportParameter(k, v);         
-       });      
+     else if (message is SendCommandPacket) {
+        print("Received command packet");
+       this.handler.ircHandler.sendCommand(message.comm);
      }
   }
 }

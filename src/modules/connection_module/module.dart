@@ -1,23 +1,34 @@
 import '../../module/main.dart';
 
-void main (args, ModuleStartRequest packet) { 
+void main (args, ModuleStartPacket packet) { 
   ConnectionModule cm = new ConnectionModule(packet);
 }
 
 class ConnectionModule extends Module {
-  ConnectionModule (ModuleStartRequest packet):super(packet) {
+  String serverPassword;
+  int state = 0;
+  String prevTestedNick = "";
+  ConnectionModule (ModuleStartPacket packet):super(packet) {
+    serverPassword = packet.serverPassword;
+   
     
   }
   bool onReceiveRaw (int code, String packet) {
-    if (code == NUMERIC_REPLIES.RPL_BOUNCE_OR_ISUPPORT) {
-      // Following is the only way to check if its a bounce or isupport that I know of
-      // Worst... Protocol... EVER.
-        if (packet.contains("is supported on this server")) {
-          ISupportParser parser = new ISupportParser.parse(packet);
-          this.sendPacket(new ISupportPacket(parser.parameters));
-        }
-        
+  
+    if (code == NUMERIC_REPLIES.ERR_NICKNAMEINUSE || code == NUMERIC_REPLIES.ERR_NICKCOLLISION) {
+      print("Nickname in use");
+      if (prevTestedNick == "") prevTestedNick = this.getBotName().name;
+      prevTestedNick = "${prevTestedNick}_";
+        this.setBotName(prevTestedNick);
     }
+    
+  }
+  bool onConnect () {
+    print("Sending user registration...");
+    if (serverPassword != null) this.sendCommand(new PassCommand(serverPassword));
+    
+    this.sendCommand(new NickCommand(this.getBotName()));
+    this.sendCommand(new UserCommand(this.getBotName(),0, "Plornts IRC Client"));
   }
 }
 

@@ -7,29 +7,30 @@ abstract class IsolatePacket {
 }
 
 /// Used to request the sendport from a module
-class ModuleStartRequest extends IsolatePacket {
+class ModuleStartPacket extends IsolatePacket {
   SendPort sendBack;
   Nickname myName;
-  ModuleStartRequest (SendPort this.sendBack);
+  String serverPassword;
+  ModuleStartPacket (SendPort this.sendBack, this.myName, [this.serverPassword]);
 }
 
 /// Used to send the sendport to the handler
-class SendPortResponse extends IsolatePacket {
+class SendportResponsePacket extends IsolatePacket {
   SendPort port;
-  SendPortResponse (SendPort this.port);
+  SendportResponsePacket (SendPort this.port);
 }
 
 /// Used to request a command to be sent to the server
-class SendCommand extends IsolatePacket {
+class SendCommandPacket extends IsolatePacket {
   Command comm;
-  SendCommand (this.comm);
+  SendCommandPacket (this.comm);
 }
 
 /// Received by the module handler 
-class CommandEvent extends IsolatePacket {
+class CommandEventPacket extends IsolatePacket {
   Target sender;
   Command event;
-  CommandEvent.withTarget (this.sender,this.event);
+  CommandEventPacket.withTarget (this.sender,this.event);
 }
 
 
@@ -40,8 +41,11 @@ class RawPacket extends IsolatePacket {
   RawPacket (this.raw, this.command);
 }
 
-/// Received by the module handler 
-class ISupportPacket extends IsolatePacket {
-  Map<String, dynamic> parameters;
-  ISupportPacket (this.parameters);
+class StopModulePacket extends IsolatePacket {
+  StopModulePacket();
+}
+
+class ConnectionStatusPacket extends IsolatePacket {
+  bool isConnected = true;
+  ConnectionStatusPacket(this.isConnected);
 }

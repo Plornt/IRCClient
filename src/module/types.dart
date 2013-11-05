@@ -23,27 +23,33 @@ class ChannelPrefix {
 }
 class ChannelName extends Target  {
   ChannelPrefix prefix;
-  ChannelName (String channel) {
-   
+  String channel;
+  ChannelName (String this.channel) {
+
+    //TODO: IMPLEMENT
   }
   String toString () {
-    //TODO: IMPLEMENT
+    return channel;
   }
 }
 class ServerName extends Target {
-  ServerName (String server) {
-    
+  String server;
+  ServerName (String this.server) {
+
+    //TODO: IMPLEMENT
   }
   String toString () {
-    //TODO: IMPLEMENT
+    return server;
   }
 }
 class UserMode {
-  UserMode (String mode) {
-    
+  String mode;
+  UserMode (String this.mode) {
+
+    //TODO: IMPLEMENT
   }
   String toString () {
-    //TODO: IMPLEMENT
+    return mode;
   }
 }
 class ChanModeValidator {
@@ -75,16 +81,6 @@ class ChanMode {
     
   }
 }
-class RealName {
-  RealName (String name) {
-    // TODO: IMPLEMENT
-    
-  }
-  String toString () {
-    // TODO: IMPLEMENT
-  }
-}
-
 class NicknamePrefix { 
     static List<NicknamePrefix> NickPrefixes = new List<NicknamePrefix>();
     final String prefix;
@@ -93,6 +89,8 @@ class NicknamePrefix {
       NickPrefixes.add(this);
     }
 }
+
+
 class Nickname extends Target {
   Host hostname;
   String name;
@@ -111,28 +109,31 @@ class Nickname extends Target {
    }
   } 
   void parseName (String nickname) {
+   if (nickname.length > 0) {
     int nameStarts = 0;
-    for (int x = 0; x < name.length; x++) {
+    for (int x = 0; x < nickname.length; x++) {
       NicknamePrefix.NickPrefixes.forEach((prefix) {
-         if (name[x] == prefix.prefix) {
+         if (nickname[x] == prefix.prefix) {
            prefixes.add(prefix);
          }
          else nameStarts = x;
       });
       if (nameStarts != 0) break;
     }
-    this.name = name.substring(nameStarts);
+    this.name = nickname.substring(nameStarts);
+   }
   }
   String toString () {
-    // TODO: IMPLEMENT
+    return this.name;
   }
 }
 class Host extends Target {
-  Host (String host) {
+  String host;
+  Host (String this.host) {
     // TODO: IMPLEMENT
     
   }
   String toString () {
-    // TODO: IMPLEMENT
+    return this.host;
   }
 }

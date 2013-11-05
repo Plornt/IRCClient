@@ -8,10 +8,11 @@ abstract class Module {
   bool _loaded = false;
   Nickname _myName;
   
-  Module (ModuleStartRequest packet) {
+  Module (ModuleStartPacket packet) {
     _me = new ReceivePort();
     this._myName = packet.myName;
     _messageHandler(packet);
+    _me.listen(_messageHandler);
   }
   
   
@@ -25,18 +26,18 @@ abstract class Module {
   
   
   void sendCommand (Command comm) {
-    _ircClient.send(new SendCommand(comm));
+    _ircClient.send(new SendCommandPacket(comm));
   } 
   void sendPacket (IsolatePacket packet) {
     _ircClient.send(packet);
   }
   
   void _messageHandler (dynamic message) {
-    if (message is ModuleStartRequest) {
+    if (message is ModuleStartPacket) {
       _ircClient = message.sendBack;
-      _ircClient.send(new SendPortResponse(_me.sendPort));
+      _ircClient.send(new SendportResponsePacket(_me.sendPort));
     }
-    else if (message is CommandEvent) { 
+    else if (message is CommandEventPacket) { 
       Command comm = message.event;
       if (comm is JoinCommand) onChannelJoin(message.sender, comm);
       else if (comm is PartCommand) {
@@ -81,7 +82,19 @@ abstract class Module {
       }
     }
     else if (message is RawPacket) {
+      print("Received raw");
       onReceiveRaw (message.raw, message.command);
+    }
+    else if (message is StopModulePacket) {
+      onModuleDeactivate();
+      print("Shutting down module");
+      _me.close();
+    }
+    else if (message is ConnectionStatusPacket) {
+      if (message.isConnected) {
+        this.onConnect();
+      }
+      else this.onDisconnect();
     }
   } 
 

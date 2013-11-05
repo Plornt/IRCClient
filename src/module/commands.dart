@@ -18,7 +18,7 @@ class Parameter {
     if (this.params != null) {
       
       params.forEach((p) { 
-        if (p != null && p.runtimeType == "List") {
+        if (p != null && p is List) {
           List temp = p;
           buffer.write(temp.join(","));
         }
@@ -46,7 +46,7 @@ class NickCommand extends Command {
 
 class UserCommand extends Command {
   Nickname nick;
-  RealName realName;
+  String realName;
   int mode;
   UserCommand(this.nick, this.mode, this.realName);
   String toString() =>  new Parameter(CLIENT_COMMANDS.USER, params: [nick, mode, "*"], trailing: realName).toString();

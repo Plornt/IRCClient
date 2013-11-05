@@ -5,21 +5,23 @@ class ISupportParser {
  ISupportParser.parse (String params) {
    List<String> splitParam = params.split(" ");
    splitParam.forEach( (String param) {
-       List<String> furtherParam = params.split("=");
+       List<String> furtherParam = param.split("=");
        bool error = false;
+       print(param);
        switch (furtherParam[0]) {
          case ISUPPORT_PARAMS.PREFIX: 
              List<List<String>> modes = new List<List<String>>();
              if (furtherParam.length > 1) { 
                String modeStr = furtherParam[1];
                if (modeStr[0] == "(") {
-                 for (var i = 0; i < ((modeStr.length - 2) / 2); i++) {
-                   modes[i] = new List<String>();
-                   modes[i][0] = modeStr[i];
+                 print(((modeStr.length - 2) ~/ 2));
+                 for (int i = 1; i <= ((modeStr.length - 2) / 2); i++) {
+                   modes.add([modeStr[i]]);
                  }
-                 for (var i = ((modeStr.length - 2) / 2); i < modeStr.length; i++) {
-                   modes[i - ((modeStr.length - 2) / 2)] = new List<String>();
-                   modes[i - ((modeStr.length - 2) / 2)][1] = modeStr[i];
+                 int b = 0;
+                 for (int i = ((modeStr.length - 2) ~/ 2) + 2; i <= modeStr.length - 1; i++) {
+                   modes[b].add(modeStr[i]);             
+                   b++;
                  }
                  parameters[ISUPPORT_PARAMS.PREFIX] = modes;
                }
@@ -45,13 +47,13 @@ class ISupportParser {
             break;
          case ISUPPORT_PARAMS.MODES: 
            int maxModes = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (maxModes > 0) {
+           if (maxModes != null) {
              parameters[ISUPPORT_PARAMS.MODES] = maxModes;
            }
            break;
          case ISUPPORT_PARAMS.MAX_CHANNELS: 
            int maxChannels = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (maxChannels > 0) {
+           if (maxChannels != null) {
              parameters[ISUPPORT_PARAMS.MAX_CHANNELS] = maxChannels;
            }
            break;
@@ -72,13 +74,13 @@ class ISupportParser {
            break;
          case ISUPPORT_PARAMS.NICK_LENGTH: 
            int nickLen = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (nickLen > 0) {
+           if (nickLen != null) {
              parameters[ISUPPORT_PARAMS.NICK_LENGTH] = nickLen;
            }  
            break;
          case ISUPPORT_PARAMS.MAX_BANS: 
            int maxBans = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (maxBans > 0) {
+           if (maxBans != null) {
              parameters[ISUPPORT_PARAMS.MAX_BANS] = maxBans;
            }  
            break;
@@ -103,14 +105,20 @@ class ISupportParser {
            }
            break;
          case ISUPPORT_PARAMS.EXCEPTS: 
-           if (furtherParam[1].length == 1) {
-            parameters[ISUPPORT_PARAMS.EXCEPTS] = furtherParam[1];
+           if (furtherParam.length > 1) {
+             if (furtherParam[1].length == 1) {
+              parameters[ISUPPORT_PARAMS.EXCEPTS] = furtherParam[1];
+             }
            }
+           else parameters[ISUPPORT_PARAMS.EXCEPTS] = true;
            break;
          case ISUPPORT_PARAMS.INVEX: 
-           if (furtherParam[1].length == 1) {
-             parameters[ISUPPORT_PARAMS.INVEX] = furtherParam[1];
+           if (furtherParam.length > 1) {
+             if (furtherParam[1].length == 1) {
+              parameters[ISUPPORT_PARAMS.INVEX] = furtherParam[1];
+             }
            }
+           else parameters[ISUPPORT_PARAMS.INVEX] = true;
            break;
          case ISUPPORT_PARAMS.WALL_CHANNEL_OPS: 
            parameters[ISUPPORT_PARAMS.WALL_CHANNEL_OPS] = true;
@@ -135,25 +143,25 @@ class ISupportParser {
            break;
          case ISUPPORT_PARAMS.TOPIC_LENGTH: 
            int topicLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (topicLength > 0) {
+           if (topicLength != null) {
              parameters[ISUPPORT_PARAMS.TOPIC_LENGTH] = topicLength;
            }  
            break;
          case ISUPPORT_PARAMS.KICK_LENGTH: 
            int kickLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (kickLength > 0) {
+           if (kickLength != null) {
              parameters[ISUPPORT_PARAMS.KICK_LENGTH] = kickLength;
            }  
            break;
          case ISUPPORT_PARAMS.CHANNEL_LENGTH: 
            int channelLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (channelLength > 0) {
+           if (channelLength != null) {
              parameters[ISUPPORT_PARAMS.CHANNEL_LENGTH] = channelLength;
            }  
            break;
          case ISUPPORT_PARAMS.CHANNEL_ID_LENGTH: 
            int channelIDLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (channelIDLength > 0) {
+           if (channelIDLength != null) {
              parameters[ISUPPORT_PARAMS.CHANNEL_ID_LENGTH] = channelIDLength;
            }  
            break;
@@ -179,7 +187,7 @@ class ISupportParser {
            break;
          case ISUPPORT_PARAMS.SILENCE: 
            int silenceLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (silenceLength > 0) {
+           if (silenceLength != null) {
              parameters[ISUPPORT_PARAMS.SILENCE] = silenceLength;
            }  
            break;
@@ -197,7 +205,7 @@ class ISupportParser {
            break;
          case ISUPPORT_PARAMS.AWAY_LENGTH: 
            int awayLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (awayLength > 0) {
+           if (awayLength != null) {
              parameters[ISUPPORT_PARAMS.AWAY_LENGTH] = awayLength;
            }  
            break;     
@@ -215,13 +223,14 @@ class ISupportParser {
            break;          
          case ISUPPORT_PARAMS.MAX_NICK_LENGTH: 
            int maxNickLength = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (maxNickLength > 0) {
+           if (maxNickLength != null) {
              parameters[ISUPPORT_PARAMS.MAX_NICK_LENGTH] = maxNickLength;
            }  
            break;          
          case ISUPPORT_PARAMS.MAX_TARGETS: 
            int maxTargets = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (maxTargets > 0) {
+           print("FFS: ${furtherParam[1]}");
+           if (maxTargets != null) {
              parameters[ISUPPORT_PARAMS.MAX_TARGETS] = maxTargets;
            }  
            break;           
@@ -233,7 +242,7 @@ class ISupportParser {
            break;           
          case ISUPPORT_PARAMS.WATCH: 
            int maxWatch = int.parse(furtherParam[1], onError: (String s) { error = true; });
-           if (maxWatch > 0) {
+           if (maxWatch != null) {
              parameters[ISUPPORT_PARAMS.WATCH] = maxWatch;
            }  
            break;            
@@ -247,7 +256,7 @@ class ISupportParser {
            parameters[ISUPPORT_PARAMS.CALLER_ID] = true;   
            break;                      
        }
-       if (error) throwError ("Malformed ISupport Message: $params");
+       if (error) throwError ("Malformed ISupport Message: Specific: $param Spec: ${furtherParam[0]} Full: $params");
    });
    
  }
