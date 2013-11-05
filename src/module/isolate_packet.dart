@@ -45,7 +45,12 @@ class StopModulePacket extends IsolatePacket {
   StopModulePacket();
 }
 
-class ConnectionStatusPacket extends IsolatePacket {
+class SocketStatusPacket extends IsolatePacket {
   bool isConnected = true;
-  ConnectionStatusPacket(this.isConnected);
+  SocketStatusPacket(this.isConnected);
+}
+
+class IRCConnectionPacket extends IsolatePacket {
+  bool connected;
+  IRCConnectionPacket (this.connected);
 }

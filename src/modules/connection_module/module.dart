@@ -26,12 +26,12 @@ class ConnectionModule extends Module {
   bool onPing (ServerName name) {
     this.sendCommand(new PongCommand(name));
   }
-  bool onConnect () {
+  bool onSocketStart () {
     print("Sending user registration...");
     if (serverPassword != null) this.sendCommand(new PassCommand(serverPassword));
     
     this.sendCommand(new NickCommand(this.getBotName()));
-    this.sendCommand(new UserCommand(this.getBotName(),0, "Plornts IRC Client"));
+    this.sendCommand(new UserCommand(this.getBotName(),0, "iRC Client"));
   }
 }
 

@@ -103,6 +103,7 @@ class Nickname extends Target {
    if (nickHost.length == 2) { 
      //NickServ!services@torn.com
      parseName(nickHost[0]);
+     print("Parsed name: ${nickHost[0]}");
      this.hostname = new Host(nickHost[1]);
    }
    else {

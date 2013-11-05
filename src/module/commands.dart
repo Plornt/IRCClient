@@ -20,6 +20,7 @@ class Parameter {
       params.forEach((p) { 
         if (p != null && p is List) {
           List temp = p;
+          buffer.write(" ");
           buffer.write(temp.join(","));
         }
         else if (p != null) buffer.write(" $p"); 

@@ -50,10 +50,10 @@ class IrcHandler {
   void startClient () {
     Socket.connect(ip, port).then((Socket socket) {
       _connection = socket;
-      moduleHandler.sendPacket(new ConnectionStatusPacket(true));
+      moduleHandler.sendPacket(new SocketStatusPacket(true));
       socket.transform(new Utf8Decoder()).transform(new LineSplitter ()).listen(messageHandler, 
-          onError: (e) { moduleHandler.sendPacket(new ConnectionStatusPacket(false));}, 
-          onDone: () { moduleHandler.sendPacket(new ConnectionStatusPacket(false)); });
+          onError: (e) { moduleHandler.sendPacket(new SocketStatusPacket(false));}, 
+          onDone: () { moduleHandler.sendPacket(new SocketStatusPacket(false)); });
     });
   }
   void messageHandler (String message) {
@@ -86,6 +86,7 @@ class IrcHandler {
           moduleHandler.sendCommand(new SQuitCommand(new ServerName(fullCommand[2]), fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
           break;
         case CLIENT_COMMANDS.JOIN: 
+          //< :Plornt__!Plornt@Torn-8850BF24.range81-132.btcentralplus.com JOIN :#lobby
           moduleHandler.sendCommand(new JoinCommand(new ChannelName(fullCommand[2].substring(1))), nickname);
           break;
         case CLIENT_COMMANDS.PART: 
@@ -109,23 +110,26 @@ class IrcHandler {
               int currParam = 3;
               List<ChanMode> changedModes = new List<ChanMode>();
               for (int x = 0; x < modeStr.length; x++) {
+                
                 if (modeStr[x] == "+") plus = true;
                 else if (modeStr[x] == "-") plus = false;
                 
-                bool found = false;
-                for (int i = 0; i < ChanModeValidator.modes.length; i++) {
-                  ChanModeValidator curMode = ChanModeValidator.modes[i];
-                  if (curMode.modeText == modeStr[x]) {
-                    String paramText = "";
-                    if (curMode.requiresParameter || (curMode.paramOnlyOnSet && plus == true)) {
-                      currParam++;
-                      paramText = fullCommand[currParam];
+                if (modeStr[x] == "+" || modeStr[x] == "-") {
+                  bool found = false;
+                  for (int i = 0; i < ChanModeValidator.modes.length; i++) {
+                    ChanModeValidator curMode = ChanModeValidator.modes[i];
+                    if (curMode.modeText == modeStr[x]) {
+                      String paramText = "";
+                      if (curMode.requiresParameter || (curMode.paramOnlyOnSet && plus == true)) {
+                        currParam++;
+                        paramText = fullCommand[currParam];
+                      }
+                      changedModes.add(new ChanMode(modeStr[x], paramText, plus));
+                      found = true;
                     }
-                    changedModes.add(new ChanMode(modeStr[x], paramText, plus));
-                    found = true;
                   }
+                  if (found == false) throwError("Incorrect mode found: $message");
                 }
-                if (found == false) throwError("Incorrect mode found: $message");
               }
               moduleHandler.sendCommand(new ChannelModeCommand.fromList(target, changedModes), nickname);
           }
@@ -159,12 +163,6 @@ class IrcHandler {
           else target = new Nickname(fullCommand[2]);
           moduleHandler.sendCommand(new NoticeCommand(target,  fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
           break;
-        case CLIENT_COMMANDS.PING:
-          moduleHandler.sendCommand(new PingCommand(new ServerName(fullCommand[2].substring(1))));
-          break;
-        case CLIENT_COMMANDS.PONG:
-          moduleHandler.sendCommand(new PongCommand(new ServerName(fullCommand[2].substring(1))));
-          break;
       }
       RegExp num = new RegExp(r"^([0-9][0-9][0-9])$");
       if (num.hasMatch(command)) {
@@ -172,12 +170,12 @@ class IrcHandler {
         int raw = int.parse(m.group(0));
         moduleHandler.sendPacket(new RawPacket(raw, fullCommand.getRange(2, fullCommand.length).join(" ")));
         
+               
         // TODO: THIS WAS COPIED FROM ANOTHER FILE AND AS SUCH DOES POINTLESS GET RANGES ETC... FIX THIS.
         String packet = fullCommand.getRange(2, fullCommand.length).join(" ");
         if (raw == NUMERIC_REPLIES.RPL_BOUNCE_OR_ISUPPORT) {
           // Following is the only way to check if its a bounce or isupport that I know of
           // Worst... Protocol... EVER.
-
           List<String> isupport = packet.split(" ");
           if (isupport.getRange(isupport.length - 5, isupport.length).toList().join(" ") == ":are supported by this server") {
             List<String> s = isupport.getRange(1, isupport.length - 5).toList();
@@ -186,12 +184,22 @@ class IrcHandler {
             parser.parameters.forEach((k, v) { 
               addISupportParameter(k, v);         
             });     
-          }
-          
+          }       
         }
-      
-      
-      
+        else if (raw == NUMERIC_REPLIES.RPL_WELCOME) {
+          moduleHandler.sendPacket(new IRCConnectionPacket(true));
+        }
+      }
+      else {
+        List<String> fullCommand = message.split(" ");
+        switch (fullCommand[0]) {
+          case CLIENT_COMMANDS.PING:
+            moduleHandler.sendCommand(new PingCommand(new ServerName(fullCommand[1].substring(1))));
+            break;
+          case CLIENT_COMMANDS.PONG:
+            moduleHandler.sendCommand(new PongCommand(new ServerName(fullCommand[1].substring(1))));
+            break;
+        }
       }
     }
   }

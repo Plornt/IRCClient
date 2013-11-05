@@ -96,11 +96,16 @@ abstract class Module {
       print("Shutting down module");
       _me.close();
     }
-    else if (message is ConnectionStatusPacket) {
+    else if (message is SocketStatusPacket) {
       if (message.isConnected) {
-        this.onConnect();
+        this.onSocketStart();
       }
-      else this.onDisconnect();
+      else this.onSocketClose();
+    }
+    else if (message is IRCConnectionPacket) {
+      if (message.connected){
+         onConnect();
+      }
     }
   } 
 
@@ -121,9 +126,10 @@ abstract class Module {
   bool onTopicChange (Target user, TopicCommand command){ }
   bool onKick (Target user, KickCommand command){ }
   
+  bool onConnect () { }
   bool onModuleStart (){ }
-  bool onDisconnect (){ }
-  bool onConnect (){ }
+  bool onSocketClose (){ }
+  bool onSocketStart (){ }
   bool onModuleDeactivate(){ }
   
 }
