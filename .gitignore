@@ -6,7 +6,7 @@
 .project
 .metadata
 bin/
-*packages*
+packages/
 tmp/
 *.tmp
 *.bak
