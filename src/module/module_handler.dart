@@ -24,6 +24,9 @@ abstract class Module {
     this.sendCommand(new NickCommand(new Nickname(nickname)));
   }
   
+  void SendMessage(Target target, String message) {
+    this.sendCommand(new PrivMsgCommand(target, message));
+  }
   
   void sendCommand (Command comm) {
     _ircClient.send(new SendCommandPacket(comm));

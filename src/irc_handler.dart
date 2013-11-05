@@ -100,10 +100,6 @@ class IrcHandler {
           //<- :Innocent!angelic@till.you.can.prove.otherwise MODE #zstaff -m 
           Target target;
 
-          print("MODE CHANGE ZOMG DONT CRASH");
-          for (int i = 0; i < ChanModeValidator.modes.length; i++) {
-            print("MODE : ${ChanModeValidator.modes[i].modeText}");
-          }
           if (ChannelPrefix.isChannel(fullCommand[2])) {
             target = new ChannelName(fullCommand[2]);
           }
