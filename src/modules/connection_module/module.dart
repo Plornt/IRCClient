@@ -23,6 +23,9 @@ class ConnectionModule extends Module {
     }
     
   }
+  bool onPing (ServerName name) {
+    this.sendCommand(new PongCommand(name));
+  }
   bool onConnect () {
     print("Sending user registration...");
     if (serverPassword != null) this.sendCommand(new PassCommand(serverPassword));

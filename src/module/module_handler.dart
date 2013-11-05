@@ -80,6 +80,12 @@ abstract class Module {
       else if (comm is ChannelModeCommand) { 
         onChannelMode(message.sender, comm);
       }
+      else if (comm is PingCommand) {
+        onPing(comm.server1);
+      }
+      else if (comm is PongCommand) {
+        onPing(comm.server1);
+      }
     }
     else if (message is RawPacket) {
       print("Received raw");
@@ -108,6 +114,8 @@ abstract class Module {
   bool onPrivateMessage (Target user, PrivMsgCommand command){ }
   bool onChannelNotice (Target user, NoticeCommand command){ }
   bool onPrivateNotice (Target user, NoticeCommand command){ }
+  bool onPing (ServerName name) { }
+  bool onPong () { }
   bool onServerError (ErrorCommand command){ }
   bool onQuit (Target user, QuitCommand command){ }
   bool onTopicChange (Target user, TopicCommand command){ }

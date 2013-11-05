@@ -76,7 +76,11 @@ class IrcHandler {
           moduleHandler.sendCommand(new NickCommand(myNick), nickname);
           break;
         case CLIENT_COMMANDS.QUIT:
-          moduleHandler.sendCommand(new QuitCommand(fullCommand.getRange(2, fullCommand.length).join(" ").substring(1)), nickname);
+          String quitMessage = "";
+          if (fullCommand.length > 1) {
+            quitMessage = fullCommand.getRange(2, fullCommand.length).join(" ").substring(1);
+          }
+          moduleHandler.sendCommand(new QuitCommand(quitMessage), nickname);
           break;
         case CLIENT_COMMANDS.SQUIT:
           moduleHandler.sendCommand(new SQuitCommand(new ServerName(fullCommand[2]), fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
@@ -85,8 +89,11 @@ class IrcHandler {
           moduleHandler.sendCommand(new JoinCommand(new ChannelName(fullCommand[2].substring(1))), nickname);
           break;
         case CLIENT_COMMANDS.PART: 
-          
-          moduleHandler.sendCommand(new PartCommand(new ChannelName(fullCommand[2]),fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
+          String partMessage = "";
+          if (fullCommand.length > 2) {
+            partMessage = fullCommand.getRange(3, fullCommand.length).join(" ").substring(1);
+          }
+          moduleHandler.sendCommand(new PartCommand(new ChannelName(fullCommand[2]),partMessage), nickname);
           break;
         case CLIENT_COMMANDS.CHAN_MODE: 
           //<- :Innocent!angelic@till.you.can.prove.otherwise MODE #zstaff -m 
@@ -130,7 +137,11 @@ class IrcHandler {
           moduleHandler.sendCommand(new TopicCommand.setTopic(new ChannelName(fullCommand[2]), fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
           break;
         case CLIENT_COMMANDS.KICK:
-          moduleHandler.sendCommand(new KickCommand(new ChannelName(fullCommand[2]), new Nickname(fullCommand[3]),  fullCommand.getRange(4, fullCommand.length).join(" ").substring(1)), nickname);
+          String kickMessage = "";
+          if (fullCommand.length > 4) {
+            kickMessage = fullCommand.getRange(4, fullCommand.length).join(" ").substring(1);
+          }
+          moduleHandler.sendCommand(new KickCommand(new ChannelName(fullCommand[2]), new Nickname(fullCommand[3]),  kickMessage), nickname);
           break;
         case CLIENT_COMMANDS.PRIV_MSG:
           Target target;
@@ -148,15 +159,17 @@ class IrcHandler {
           else target = new Nickname(fullCommand[2]);
           moduleHandler.sendCommand(new NoticeCommand(target,  fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
           break;
-        
+        case CLIENT_COMMANDS.PING:
+          moduleHandler.sendCommand(new PingCommand(new ServerName(fullCommand[2].substring(1))));
+          break;
+        case CLIENT_COMMANDS.PONG:
+          moduleHandler.sendCommand(new PongCommand(new ServerName(fullCommand[2].substring(1))));
+          break;
       }
-      print(command);
       RegExp num = new RegExp(r"^([0-9][0-9][0-9])$");
       if (num.hasMatch(command)) {
-        print("Regex match");
         Match m = num.firstMatch(command);
         int raw = int.parse(m.group(0));
-        print(raw);
         moduleHandler.sendPacket(new RawPacket(raw, fullCommand.getRange(2, fullCommand.length).join(" ")));
         
         // TODO: THIS WAS COPIED FROM ANOTHER FILE AND AS SUCH DOES POINTLESS GET RANGES ETC... FIX THIS.
@@ -166,12 +179,9 @@ class IrcHandler {
           // Worst... Protocol... EVER.
 
           List<String> isupport = packet.split(" ");
-          print(isupport.getRange(isupport.length - 5, isupport.length).join(" "));
           if (isupport.getRange(isupport.length - 5, isupport.length).toList().join(" ") == ":are supported by this server") {
-            print("Parsing ISUPPORT");
             List<String> s = isupport.getRange(1, isupport.length - 5).toList();
             String p = s.join(" ");
-            print(p);
             ISupportParser parser = new ISupportParser.parse(p);
             parser.parameters.forEach((k, v) { 
               addISupportParameter(k, v);         
