@@ -62,6 +62,7 @@ class IrcHandler {
       message = message.substring(1);
       List<String> fullCommand = message.split(" ");
       Nickname nickname;
+      print("${fullCommand[0]} DEBUG");
       if (fullCommand[0].contains("@")) nickname = new Nickname.fromHostString(fullCommand[0]);
       else nickname = new Nickname(fullCommand[0]);
       String command = fullCommand[1];
@@ -89,31 +90,41 @@ class IrcHandler {
           break;
         case CLIENT_COMMANDS.CHAN_MODE: 
           //<- :Innocent!angelic@till.you.can.prove.otherwise MODE #zstaff -m 
-          ChannelName channel = new ChannelName(fullCommand[2]);
-          String modeStr = fullCommand[3];
-          bool plus = true;
-          int currParam = 3;
-          List<ChanMode> changedModes = new List<ChanMode>();
-          for (int x = 0; x < modeStr.length; x++) {
-            if (modeStr[x] == "+") plus = true;
-            else if (modeStr[x] == "-") plus = false;
-            
-            bool found = false;
-            for (int i = 0; i < ChanModeValidator.modes.length; i++) {
-              ChanModeValidator curMode = ChanModeValidator.modes[i];
-              if (curMode.modeText == modeStr[x]) {
-                String paramText = "";
-                if (curMode.requiresParameter || (curMode.paramOnlyOnSet && plus == true)) {
-                  currParam++;
-                  paramText = fullCommand[currParam];
-                }
-                changedModes.add(new ChanMode(modeStr[x], paramText, plus));
-                found = true;
-              }
-            }
-            if (found == false) throwError("Incorrect mode found: $message");
+          Target target;
+          print(fullCommand[2]);
+          if (ChannelPrefix.isChannel(fullCommand[2])) {
+            target = new ChannelName(fullCommand[2]);
           }
-          moduleHandler.sendCommand(new ChannelModeCommand.fromList(channel, changedModes), nickname);
+          else target = new Nickname(fullCommand[2]);
+          if (target is ChannelName) {
+              String modeStr = fullCommand[3];
+              bool plus = true;
+              int currParam = 3;
+              List<ChanMode> changedModes = new List<ChanMode>();
+              for (int x = 0; x < modeStr.length; x++) {
+                if (modeStr[x] == "+") plus = true;
+                else if (modeStr[x] == "-") plus = false;
+                
+                bool found = false;
+                for (int i = 0; i < ChanModeValidator.modes.length; i++) {
+                  ChanModeValidator curMode = ChanModeValidator.modes[i];
+                  if (curMode.modeText == modeStr[x]) {
+                    String paramText = "";
+                    if (curMode.requiresParameter || (curMode.paramOnlyOnSet && plus == true)) {
+                      currParam++;
+                      paramText = fullCommand[currParam];
+                    }
+                    changedModes.add(new ChanMode(modeStr[x], paramText, plus));
+                    found = true;
+                  }
+                }
+                if (found == false) throwError("Incorrect mode found: $message");
+              }
+              moduleHandler.sendCommand(new ChannelModeCommand.fromList(target, changedModes), nickname);
+          }
+          else {
+            moduleHandler.sendCommand(new UserModeCommand(target, new UserMode(fullCommand[3].substring(1))));
+          }
           break;
         case CLIENT_COMMANDS.TOPIC:
           moduleHandler.sendCommand(new TopicCommand.setTopic(new ChannelName(fullCommand[2]), fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
@@ -137,7 +148,7 @@ class IrcHandler {
           else target = new Nickname(fullCommand[2]);
           moduleHandler.sendCommand(new NoticeCommand(target,  fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
           break;
-               
+        
       }
       print(command);
       RegExp num = new RegExp(r"^([0-9][0-9][0-9])$");

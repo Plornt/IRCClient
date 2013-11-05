@@ -100,9 +100,10 @@ class Nickname extends Target {
   }
   Nickname.fromHostString (String splitter) {
    List<String> nickHost = splitter.split("!");
-   if (splitter.length == 2) { 
-     parseName(splitter[0]);
-     this.hostname = new Host(splitter[1]);
+   if (nickHost.length == 2) { 
+     //NickServ!services@torn.com
+     parseName(nickHost[0]);
+     this.hostname = new Host(nickHost[1]);
    }
    else {
       throw "Does not match required syntax";     

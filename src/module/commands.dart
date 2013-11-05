@@ -60,7 +60,7 @@ class OperCommand extends Command {
 }
 
 
-class UserModeCommand {
+class UserModeCommand extends Command {
   UserMode mode;
   Nickname nickname;
   UserModeCommand (this.nickname, this.mode); 
