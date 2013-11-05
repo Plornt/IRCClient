@@ -6,7 +6,7 @@
 .project
 .metadata
 bin/
-unit_tests/packages/
+.unit_tests/packages/
 tmp/
 *.tmp
 *.bak
