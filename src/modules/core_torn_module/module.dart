@@ -22,7 +22,7 @@ class TestModule extends Module {
         else this.SendMessage(command.target, "$name's ID: $id");
       });
     }
-    else if (command.get(1) == "!addid") {
+    else if (command.get(0) == "!addid") {
       String name = (command.get(2) != "" ? command.get(1) : user.name);
       getID(name).then((int id) {      
         if (id != null) {
