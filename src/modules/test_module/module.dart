@@ -14,9 +14,8 @@ class TestModule extends Module {
     
   }
   
-  bool onChannelPrivMsg (Target user, PrivMsgCommand command) {
-    List<String> msg = command.message.split(" ");
-    if (msg[0] == "!test") {
+  bool onChannelMessage (Target user, PrivMsgCommand command) {
+    if (command.get(0) == "!test") {
       this.sendCommand(new PrivMsgCommand(command.target, "I am here ${user}!"));
     }
   }

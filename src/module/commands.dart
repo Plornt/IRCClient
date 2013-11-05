@@ -234,7 +234,28 @@ class KickCommand extends Command {
 class PrivMsgCommand extends Command {
   Target target;
   String message;
-  PrivMsgCommand (Target this.target, String this.message);
+  List<String> _splitMsg;
+  PrivMsgCommand (Target this.target, String this.message) {
+    
+  }
+  int getl () {
+    if (_splitMsg == null) _splitMsg = message.split(" ");
+    return _splitMsg.length;
+  }
+  String get (int start, [int end]) {
+    if (_splitMsg == null) _splitMsg = message.split(" ");
+    if (end == null) {
+      if (start < _splitMsg.length && start >= 0) return _splitMsg[start];
+      else return "";
+    }
+    else {
+      if (start < _splitMsg.length && start >= 0 && start < end) {
+        if (end+1 > _splitMsg.length) end = _splitMsg.length - 1;
+        return _splitMsg.getRange(start, end).join(" ");
+      }
+      else return "";
+    }
+  }
   String toString () => new Parameter(CLIENT_COMMANDS.PRIV_MSG, params: [target], trailing: message).toString();
 }
 
@@ -242,7 +263,26 @@ class PrivMsgCommand extends Command {
 class NoticeCommand extends Command {
   Target target;
   String message;
+  List<String> _splitMsg;
   NoticeCommand (Target this.target, String this.message);
+  int getl () {
+    if (_splitMsg == null) _splitMsg = message.split(" ");
+    return _splitMsg.length;
+  }
+  String get (int start, [int end]) {
+    if (_splitMsg == null) _splitMsg = message.split(" ");
+    if (end == null) {
+      if (start < _splitMsg.length && start >= 0) return _splitMsg[start];
+      else return "";
+    }
+    else {
+      if (start < _splitMsg.length && start >= 0 && start < end) {
+        if (end+1 > _splitMsg.length) end = _splitMsg.length - 1;
+        return _splitMsg.getRange(start, end).join(" ");
+      }
+      else return "";
+    }
+  }
   String toString () => new Parameter(CLIENT_COMMANDS.NOTICE, params: [target], trailing: message).toString();
 }
 

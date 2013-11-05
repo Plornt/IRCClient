@@ -32,7 +32,7 @@ class CLIENT_COMMANDS {
   static const String LIST = "LIST";
   static const String INVITE = "INVITE";
   static const String KICK = "KICK";
-  static const String PRIV_MSG = "SQUIT";
+  static const String PRIV_MSG = "PRIVMSG";
   static const String NOTICE = "NOTICE";
   static const String MOTD = "MOTD";
   static const String L_USERS = "LUSERS";

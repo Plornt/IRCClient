@@ -113,16 +113,23 @@ class Nickname extends Target {
   void parseName (String nickname) {
    if (nickname.length > 0) {
     int nameStarts = 0;
+    bool done = false;
     for (int x = 0; x < nickname.length; x++) {
-      NicknamePrefix.NickPrefixes.forEach((prefix) {
+      for (int i = 0; i < NicknamePrefix.NickPrefixes.length; i++) {
+        NicknamePrefix prefix = NicknamePrefix.NickPrefixes[i];
          if (nickname[x] == prefix.prefix) {
            prefixes.add(prefix);
          }
-         else nameStarts = x;
-      });
-      if (nameStarts != 0) break;
+         else {
+           nameStarts = x;
+           done = true;
+           break;
+         }
+      }
+      if (done) break;
     }
     this.name = nickname.substring(nameStarts);
+    print("Parsed name2: ${name} ${nameStarts}");
    }
   }
   String toString () {

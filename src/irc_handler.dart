@@ -99,7 +99,11 @@ class IrcHandler {
         case CLIENT_COMMANDS.CHAN_MODE: 
           //<- :Innocent!angelic@till.you.can.prove.otherwise MODE #zstaff -m 
           Target target;
-          print(fullCommand[2]);
+
+          print("MODE CHANGE ZOMG DONT CRASH");
+          for (int i = 0; i < ChanModeValidator.modes.length; i++) {
+            print("MODE : ${ChanModeValidator.modes[i].modeText}");
+          }
           if (ChannelPrefix.isChannel(fullCommand[2])) {
             target = new ChannelName(fullCommand[2]);
           }
@@ -114,7 +118,7 @@ class IrcHandler {
                 if (modeStr[x] == "+") plus = true;
                 else if (modeStr[x] == "-") plus = false;
                 
-                if (modeStr[x] == "+" || modeStr[x] == "-") {
+                if (modeStr[x] != "+" && modeStr[x] != "-") {
                   bool found = false;
                   for (int i = 0; i < ChanModeValidator.modes.length; i++) {
                     ChanModeValidator curMode = ChanModeValidator.modes[i];
@@ -128,7 +132,7 @@ class IrcHandler {
                       found = true;
                     }
                   }
-                  if (found == false) throwError("Incorrect mode found: $message");
+                  if (found == false) throwError("Incorrect mode found: $message ");
                 }
               }
               moduleHandler.sendCommand(new ChannelModeCommand.fromList(target, changedModes), nickname);
@@ -153,6 +157,7 @@ class IrcHandler {
             target = new ChannelName(fullCommand[2]);
           }
           else target = new Nickname(fullCommand[2]);
+          print("PRIVATE MESSAGE!");
           moduleHandler.sendCommand(new PrivMsgCommand(target,  fullCommand.getRange(3, fullCommand.length).join(" ").substring(1)), nickname);
           break;
         case CLIENT_COMMANDS.NOTICE:
@@ -190,21 +195,23 @@ class IrcHandler {
           moduleHandler.sendPacket(new IRCConnectionPacket(true));
         }
       }
-      else {
-        List<String> fullCommand = message.split(" ");
-        switch (fullCommand[0]) {
-          case CLIENT_COMMANDS.PING:
-            moduleHandler.sendCommand(new PingCommand(new ServerName(fullCommand[1].substring(1))));
-            break;
-          case CLIENT_COMMANDS.PONG:
-            moduleHandler.sendCommand(new PongCommand(new ServerName(fullCommand[1].substring(1))));
-            break;
-        }
+      
+    }
+    else {
+      List<String> fullCommand = message.split(" ");
+      switch (fullCommand[0]) {
+        case CLIENT_COMMANDS.PING:
+          moduleHandler.sendCommand(new PingCommand(new ServerName(fullCommand[1].substring(1))));
+          break;
+        case CLIENT_COMMANDS.PONG:
+          moduleHandler.sendCommand(new PongCommand(new ServerName(fullCommand[1].substring(1))));
+          break;
       }
     }
   }
   void sendCommand (Command comm) {
     if (_connection != null) {
+      print ("> ${comm.toString()}");
       _connection.writeln(comm.toString());
     }
   }

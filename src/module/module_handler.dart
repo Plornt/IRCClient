@@ -50,6 +50,7 @@ abstract class Module {
         onNickChange(message.sender, comm);
       }
       else if (comm is PrivMsgCommand) {
+        print("RECEIVED PRIVMSG COMMAND");
         if (comm.target is ChannelName) {
           onChannelMessage(message.sender, comm);
         }
