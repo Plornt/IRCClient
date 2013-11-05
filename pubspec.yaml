@@ -1,4 +1,4 @@
-name: unit_tests
+name: IRCBot
 description: A sample command-line application
 dependencies:
-  unittest: any
+  sqljocky: any
