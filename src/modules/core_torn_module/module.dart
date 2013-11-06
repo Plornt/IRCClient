@@ -14,6 +14,7 @@ void main (args, ModuleStartPacket packet) {
       response = response.replaceAll("\${k}", k);
       response = response.replaceAll("\${it}", it);
       response = response.replaceAll("\${u}", b);
+      print(data[0]);
       idCommands.add(data[0]);
       Language.add("ID_${data[0]}", "$theme$response");
     });
@@ -22,14 +23,14 @@ void main (args, ModuleStartPacket packet) {
   Language.add("ID_INVALID", "${theme}Invalid parameters. Please use ${b}!addid ${u}Nick${u} ${u}ID${u}");
   Language.add("ID_DELETED", "${theme}Deleted ${b}&1's${b} ID.");
   Language.add("ID_NO_ID", "${theme}There is no ID for that nick given. You can add their ID with ${b}!addid ${u}Nick${u} ${u}ID${u}");
-  Language.add("ID_NO_OP_INVALID", "${theme}You are not op or you did not enter a vlaid nickname to delete. Please use: ${b}!delid ${u}Nick${u}");
+  Language.add("ID_NO_OP_INVALID", "${theme}You are not op or you did not enter a valid nickname to delete. Please use: ${b}!delid ${u}Nick${u}");
   Language.add("ID_ALREADY_ADDED", "${theme}${b}&1's${b} ID is already added as${b} &2${b}. If this is incorrect please ask an op to remove it.");
   Language.add("ID_COMMAND_THEME", "${theme}&1");
-  TestModule cm = new TestModule(packet);
+  CoreModule cm = new CoreModule(packet);
 }
 
-class TestModule extends Module {
-  TestModule (ModuleStartPacket packet):super(packet) {
+class CoreModule extends Module {
+  CoreModule (ModuleStartPacket packet):super(packet) {
     
   }
   
@@ -64,8 +65,8 @@ class TestModule extends Module {
           this.SendMessage(command.target, Language.get("ID_NO_ID", [name]));
         }
         else {
-          
-          this.SendMessage(command.target, Language.get("ID_${command.get(0)}", []));
+          print("GETTING ID");
+          this.SendMessage(command.target, Language.get("ID_${command.get(0)}", [name, id]));
         }
       });
     }
