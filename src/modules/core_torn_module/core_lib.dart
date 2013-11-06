@@ -22,3 +22,22 @@ void addID (String username, String id) {
     print(e);
   });
 }
+
+class Language {
+  static Map<String, String> language = new Map<String, String>();
+  static void add (String key, String message) {
+    language[key]  = message;
+  }
+  static String get (String key, List<dynamic> arguments) {
+    if (language.containsKey(key)) {
+      RegExp langMatch = new RegExp(r"&([0-9]+?)");
+      int x = 0;
+      String sentence = language[key].replaceAllMapped(langMatch, (Match match) {
+          x = int.parse(match.group(1)) - 1;
+          return arguments[x];
+      });
+      return sentence;
+    }
+    else return "Language file error";
+  }
+}

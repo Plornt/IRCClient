@@ -1,5 +1,12 @@
 part of IrcModule;
 
+
+String b = "";
+String u = "";
+String k = "";
+String it = "";
+
+
 class Target {
   
 }
@@ -95,6 +102,10 @@ class Nickname extends Target {
   Host hostname;
   String name;
   List<NicknamePrefix> prefixes = new List<NicknamePrefix>();
+  bool isOp = false;
+  bool isVoice = false;
+  bool isHop = false;
+  
   Nickname (String nickname) {
     parseName(nickname);
   }
@@ -117,7 +128,19 @@ class Nickname extends Target {
     for (int x = 0; x < nickname.length; x++) {
       for (int i = 0; i < NicknamePrefix.NickPrefixes.length; i++) {
         NicknamePrefix prefix = NicknamePrefix.NickPrefixes[i];
+        
          if (nickname[x] == prefix.prefix) {
+           if (prefix.modeText == "o") {
+             isOp = true;
+             isVoice = true;
+             isHop = true;
+           }
+           if (prefix.modeText == "h") {
+             isHop = true;
+           }
+           if (prefix.modeText == "v") {
+             isVoice = true;
+           }
            prefixes.add(prefix);
          }
          else {
