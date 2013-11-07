@@ -1,24 +1,15 @@
+library CoreTornModule;
+
 import '../../module/main.dart';
 import 'database.dart';
 import 'core_lib.dart';
 import 'dart:async';
 
 String theme = "${k}03";
-List<String> idCommands = new List<String>();
-
-
 void main (args, ModuleStartPacket packet) { 
-  getDatabase().query("SELECT command, response FROM id_commands").then((res) { 
-    res.stream.listen((data) { 
-      String response = data[1].replaceAll("\${b}", b);
-      response = response.replaceAll("\${k}", k);
-      response = response.replaceAll("\${it}", it);
-      response = response.replaceAll("\${u}", b);
-      print(data[0]);
-      idCommands.add(data[0]);
-      Language.add("ID_${data[0]}", "$theme$response");
-    });
-  });
+  CoreModule.idCommands.add("!id");
+  Language.add("ID_!id", "");
+  
   Language.add("ID_ADDED", "${theme}Added ${b}&1's${b} ID as${b} &2");
   Language.add("ID_INVALID", "${theme}Invalid parameters. Please use ${b}!addid ${u}Nick${u} ${u}ID${u}");
   Language.add("ID_DELETED", "${theme}Deleted ${b}&1's${b} ID.");
@@ -30,6 +21,8 @@ void main (args, ModuleStartPacket packet) {
 }
 
 class CoreModule extends Module {
+  static  List<String> idCommands = new List<String>();
+
   CoreModule (ModuleStartPacket packet):super(packet) {
     
   }
@@ -65,7 +58,6 @@ class CoreModule extends Module {
           this.SendMessage(command.target, Language.get("ID_NO_ID", [name]));
         }
         else {
-          print("GETTING ID");
           this.SendMessage(command.target, Language.get("ID_${command.get(0)}", [name, id]));
         }
       });

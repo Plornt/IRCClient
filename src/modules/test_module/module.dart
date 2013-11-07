@@ -1,3 +1,5 @@
+library TestModule;
+
 import '../../module/main.dart';
 
 void main (args, ModuleStartPacket packet) { 
@@ -15,8 +17,8 @@ class TestModule extends Module {
   }
   
   bool onChannelMessage (Target user, PrivMsgCommand command) {
-    if (command.get(0) == "!test") {
-      this.sendCommand(new PrivMsgCommand(command.target, "I am here ${user}!"));
+    if (command.get(0) == "!disconnect") {
+      this.sendCommand(new QuitCommand("BYE CRUEL WORLD"));
     }
   }
   bool onChannelJoin (Target user, JoinCommand command) {
@@ -27,14 +29,12 @@ class TestModule extends Module {
         if (command.channels.keys.elementAt(0).channel == "#Lobby") {
           this.sendCommand(new PartCommand(lobby, "I am a bot! :("));
         }
-        else if (command.channels.keys.elementAt(0).channel == "#zstaff") {
-          this.sendCommand(new PrivMsgCommand(new ChannelName("#Zstaff"), "Test!"));
-        }
       }
     }
+    
   }
   bool onConnect () {
-    this.sendCommand(new JoinCommand(new ChannelName("#Zstaff")));
+    this.sendCommand(new JoinCommand(new ChannelName("#Mugs")));
   }
 }
 

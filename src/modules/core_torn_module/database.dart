@@ -1,3 +1,5 @@
+library Database;
+
 import 'package:sqljocky/sqljocky.dart';
 
 ConnectionPool _cached;
