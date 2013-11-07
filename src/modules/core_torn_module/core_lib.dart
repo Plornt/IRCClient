@@ -1,6 +1,8 @@
+library CoreLib;
+
 import 'database.dart';
 import 'dart:async';
-
+import '../../module/main.dart';
 
 Future<int> getID (String username) {
   Completer c = new Completer();
@@ -13,6 +15,9 @@ Future<int> getID (String username) {
   return c.future;
 }
 
+
+
+
 Future<dynamic> deleteID (String username) {
   return getDatabase().prepareExecute("DELETE FROM ids WHERE nickname = ?",[username]);
 }
@@ -22,6 +27,63 @@ void addID (String username, String id) {
     print(e);
   });
 }
+
+
+class ChannelCommandStatus {
+  static void changeStatus (ChannelName channel, String identifier, int status) {
+    getDatabase().prepareExecute("SELECT status FROM command_status WHERE channelName = ? AND commandTag = ?", [channel.toString(), identifier])
+      .then((res) { 
+          getDatabase().prepareExecute("INSERT INTO command_status (channelName, commandTag, status) VALUES (?,?,?)", [channel, identifier, status])
+                       .then((res) { 
+                         print("Inserted ${res.affectedRows} rows to change status");
+                       })
+                       .catchError((error) { 
+                         print("ERROR ${error.toString()}");
+                       });
+      }); 
+  }
+  static void turnOn (ChannelName channel, String identifier) {
+      changeStatus(channel, identifier, 1);
+  }
+  static void turnOff (ChannelName channel, String identifier) {
+    changeStatus(channel, identifier, 0);
+  }
+  static Future<int> getStatus (ChannelName channel, String identifier) {
+    Completer c = new Completer();
+    getDatabase().prepareExecute("SELECT status FROM command_status WHERE channelName = ? AND commandTag = ?", [channel.toString(), identifier])
+                 .then((res) { 
+                   res.stream.listen((val) { 
+                     c.complete(val[0]); 
+                     res.stream.close();
+                   },onDone: () { c.complete(0); });
+                 });
+    return c.future;
+  }
+  static Future<bool> isOn (ChannelName channel, String identifier) {
+    Completer c = new Completer();
+    getStatus(channel, identifier).then((int status) {
+      if (status == 1) c.complete(true);
+      else c.complete(false);
+    });
+    return c.future;
+    
+  }
+  static Future<List<String>> getAllOn(String identifier) {
+    Completer c = new Completer();
+    List<String> on = new List<String>();
+    getDatabase().prepareExecute("SELECT channelName FROM command_status WHERE commandTag = ? AND status = 1", [identifier])
+                 .then((res) { 
+                   res.stream.listen((val) { 
+                     on.add(val[0]);
+                   }, onDone: () { c.complete(); });
+                 });
+    return c.future;
+  }
+  
+}
+
+
+
 
 class Language {
   static Map<String, String> language = new Map<String, String>();
