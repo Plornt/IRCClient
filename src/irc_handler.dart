@@ -50,10 +50,10 @@ class IrcHandler {
   void startClient () {
     Socket.connect(ip, port).then((Socket socket) {
       _connection = socket;
-      moduleHandler.sendPacket(new SocketStatusPacket(true));
+      moduleHandler.sendAllPacket(new SocketStatusPacket(true));
       socket.transform(new Utf8Decoder()).transform(new LineSplitter ()).listen(messageHandler, 
-          onError: (e) { moduleHandler.sendPacket(new SocketStatusPacket(false));}, 
-          onDone: () { moduleHandler.sendPacket(new SocketStatusPacket(false)); });
+          onError: (e) { moduleHandler.sendAllPacket(new SocketStatusPacket(false));}, 
+          onDone: () { moduleHandler.sendAllPacket(new SocketStatusPacket(false)); });
     });
   }
   void messageHandler (String message) {
@@ -62,7 +62,6 @@ class IrcHandler {
       message = message.substring(1);
       List<String> fullCommand = message.split(" ");
       Nickname nickname;
-      print("${fullCommand[0]} DEBUG");
       if (fullCommand[0].contains("@")) nickname = new Nickname.fromHostString(fullCommand[0]);
       else nickname = new Nickname(fullCommand[0]);
       String command = fullCommand[1];
@@ -91,10 +90,11 @@ class IrcHandler {
           break;
         case CLIENT_COMMANDS.PART: 
           String partMessage = "";
-          if (fullCommand.length > 2) {
-            partMessage = fullCommand.getRange(3, fullCommand.length).join(" ").substring(1);
+          if (fullCommand.length > 3) {
+            partMessage = fullCommand.getRange(3, fullCommand.length).join(" ");
+            if (partMessage.length > 0) partMessage = partMessage.substring(1);
           }
-          moduleHandler.sendCommand(new PartCommand(new ChannelName(fullCommand[2]),partMessage), nickname);
+          moduleHandler.sendCommand(new PartCommand(new ChannelName(fullCommand[2]), partMessage), nickname);
           break;
         case CLIENT_COMMANDS.CHAN_MODE: 
           //<- :Innocent!angelic@till.you.can.prove.otherwise MODE #zstaff -m 
@@ -169,7 +169,7 @@ class IrcHandler {
       if (num.hasMatch(command)) {
         Match m = num.firstMatch(command);
         int raw = int.parse(m.group(0));
-        moduleHandler.sendPacket(new RawPacket(raw, fullCommand.getRange(2, fullCommand.length).join(" ")));
+        moduleHandler.sendAllPacket(new RawPacket(raw, fullCommand.getRange(2, fullCommand.length).join(" ")));
         
                
         // TODO: THIS WAS COPIED FROM ANOTHER FILE AND AS SUCH DOES POINTLESS GET RANGES ETC... FIX THIS.
@@ -188,7 +188,7 @@ class IrcHandler {
           }       
         }
         else if (raw == NUMERIC_REPLIES.RPL_WELCOME) {
-          moduleHandler.sendPacket(new IRCConnectionPacket(true));
+          moduleHandler.sendAllPacket(new IRCConnectionPacket(true));
         }
       }
       

@@ -251,7 +251,7 @@ class PrivMsgCommand extends Command {
     else {
       if (start < _splitMsg.length && start >= 0 && start < end) {
         if (end+1 > _splitMsg.length) end = _splitMsg.length - 1;
-        return _splitMsg.getRange(start, end).join(" ");
+        return _splitMsg.getRange(start, end + 1).join(" ");
       }
       else return "";
     }
@@ -278,7 +278,7 @@ class NoticeCommand extends Command {
     else {
       if (start < _splitMsg.length && start >= 0 && start < end) {
         if (end+1 > _splitMsg.length) end = _splitMsg.length - 1;
-        return _splitMsg.getRange(start, end).join(" ");
+        return _splitMsg.getRange(start, end + 1).join(" ");
       }
       else return "";
     }

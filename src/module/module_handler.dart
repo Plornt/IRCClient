@@ -53,7 +53,6 @@ abstract class Module {
         onNickChange(message.sender, comm);
       }
       else if (comm is PrivMsgCommand) {
-        print("RECEIVED PRIVMSG COMMAND");
         if (comm.target is ChannelName) {
           onChannelMessage(message.sender, comm);
         }
@@ -92,12 +91,10 @@ abstract class Module {
       }
     }
     else if (message is RawPacket) {
-      print("Received raw");
       onReceiveRaw (message.raw, message.command);
     }
     else if (message is StopModulePacket) {
       onModuleDeactivate();
-      print("Shutting down module");
       _me.close();
     }
     else if (message is SocketStatusPacket) {
@@ -129,6 +126,7 @@ abstract class Module {
   bool onQuit (Target user, QuitCommand command){ }
   bool onTopicChange (Target user, TopicCommand command){ }
   bool onKick (Target user, KickCommand command){ }
+  bool onStartupComplete () { }  
   
   bool onConnect () { }
   bool onModuleStart (){ }

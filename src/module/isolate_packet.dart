@@ -54,3 +54,19 @@ class IRCConnectionPacket extends IsolatePacket {
   bool connected;
   IRCConnectionPacket (this.connected);
 }
+
+class ModuleStatusChangePacket extends IsolatePacket {
+  String moduleName;
+  int status = 0;
+  ModuleStatusChangePacket(this.moduleName, this.status);
+}
+
+class ModuleDependencyPacket {
+  SendPort port; 
+  String moduleName;
+  ModuleDependencyPacket(this.port, this.moduleName);
+}
+
+class AllModulesLoadedPacket {
+  AllModulesLoadedPacket();
+}

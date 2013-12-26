@@ -32,14 +32,17 @@ void addID (String username, String id) {
 class ChannelCommandStatus {
   static void changeStatus (ChannelName channel, String identifier, int status) {
     getDatabase().prepareExecute("SELECT status FROM command_status WHERE channelName = ? AND commandTag = ?", [channel.toString(), identifier])
-      .then((res) { 
-          getDatabase().prepareExecute("INSERT INTO command_status (channelName, commandTag, status) VALUES (?,?,?)", [channel, identifier, status])
-                       .then((res) { 
-                         print("Inserted ${res.affectedRows} rows to change status");
-                       })
-                       .catchError((error) { 
-                         print("ERROR ${error.toString()}");
-                       });
+      .then((res) {
+        bool hasRows = false;
+        res.stream.listen((d) { 
+          if (hasRows == false) getDatabase().prepareExecute("UPDATE command_status SET status = ? WHERE channelName = ? AND commandTag = ? ", [status, channel, identifier]);
+          
+          hasRows = true;
+          }, onDone: () { 
+          if (hasRows == false) {
+            getDatabase().prepareExecute("INSERT INTO command_status (channelName, commandTag, status) VALUES (?,?,?)", [channel, identifier, status]);
+          }
+        });
       }); 
   }
   static void turnOn (ChannelName channel, String identifier) {
@@ -75,7 +78,9 @@ class ChannelCommandStatus {
                  .then((res) { 
                    res.stream.listen((val) { 
                      on.add(val[0]);
-                   }, onDone: () { c.complete(); });
+                   }, onDone: () {
+                     c.complete(on);
+                   });
                  });
     return c.future;
   }
